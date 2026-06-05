@@ -23,6 +23,8 @@ assert.match(html, /bootstrap\.catalog\.summaryUrl/);
 assert.match(html, /bootstrap\.catalog\.queryUrl/);
 assert.match(html, /bootstrap\.subPath/);
 assert.match(html, /https:\/\/furulei\.github\.io\/cf\/vendor\/qrcode\.min\.js/);
+assert.match(html, /DEFAULT_SUB_NAME\s*=\s*"\\u5f52\\u6765\\u662f\\u5c11\\u5e74"/);
+assert.doesNotMatch(html, /edgetunnel/);
 assert.doesNotMatch(html, /a\.ip168\.dpdns\.org\/a/);
 assert.doesNotMatch(html, /adminPassword/);
 assert.doesNotMatch(html, /\/admin\/config\.json/);
