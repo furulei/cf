@@ -652,6 +652,7 @@
 
     const PROXY_KEY = "\u53cd\u4ee3";
     const SUB_KEY = "\u4f18\u9009\u8ba2\u9605\u751f\u6210";
+    const DEFAULT_SUB_NAME = "\u5f52\u6765\u662f\u5c11\u5e74";
     const bootstrap = injected;
     const state = {
       config: null,
@@ -771,7 +772,7 @@
       fields.host.value = config.HOST || "";
       fields.uuid.value = config.UUID || "";
       fields.token.value = sub.TOKEN || "";
-      fields.subName.value = sub.SUBNAME || "edgetunnel";
+      fields.subName.value = sub.SUBNAME || DEFAULT_SUB_NAME;
       fields.fingerprint.value = config.Fingerprint || "chrome";
       fields.echEnabled.checked = Boolean(config.ECH);
       fields.echDns.value = ech.DNS || "";
@@ -800,7 +801,7 @@
       proxy.Mode = fields.proxyMode.value;
       proxy.PROXYIP = fields.proxyip.value.trim();
       sub.TOKEN = fields.token.value.trim();
-      sub.SUBNAME = fields.subName.value.trim() || "edgetunnel";
+      sub.SUBNAME = fields.subName.value.trim() || DEFAULT_SUB_NAME;
       config[PROXY_KEY] = proxy;
       config[SUB_KEY] = sub;
       return config;
