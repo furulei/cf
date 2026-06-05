@@ -1,0 +1,11 @@
+#:schema node_modules/wrangler/config-schema.json
+name = "ip168-subconv"
+main = "src/worker.jsx"
+compatibility_date = "2024-07-24"
+compatibility_flags = ["nodejs_compat"]
+routes = [
+  { pattern = "sub.ip168.dpdns.org", custom_domain = true }
+]
+
+[assets]
+directory = "./public"
