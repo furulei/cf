@@ -1,0 +1,1140 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>IP168 控制台</title>
+  <!--IP168_BOOTSTRAP-->
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --panel-soft: #f9fbfd;
+      --line: #d8e0ea;
+      --text: #182235;
+      --muted: #64748b;
+      --brand: #116d62;
+      --brand-strong: #0b4f48;
+      --blue: #2457a6;
+      --red: #b42318;
+      --amber: #9a5b13;
+      --shadow: 0 10px 28px rgba(24, 34, 53, 0.08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .shell {
+      width: min(1280px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 22px 0 36px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+    h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+    }
+    .status {
+      min-width: min(420px, 100%);
+      max-width: 560px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+    .status.ok {
+      color: var(--brand-strong);
+      border-color: rgba(17, 109, 98, 0.35);
+    }
+    .status.error {
+      color: var(--red);
+      border-color: rgba(180, 35, 24, 0.35);
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+    }
+    .tab {
+      width: auto;
+      min-width: 92px;
+      border-color: var(--line);
+      background: #fff;
+      color: var(--text);
+    }
+    .tab.active {
+      border-color: rgba(17, 109, 98, 0.45);
+      background: var(--brand);
+      color: #fff;
+    }
+    .view {
+      display: none;
+    }
+    .view.active {
+      display: block;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.92fr) minmax(420px, 1.45fr);
+      gap: 14px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .panel.flat {
+      box-shadow: none;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      font-size: 14px;
+      font-weight: 650;
+    }
+    .check input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+    }
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+      letter-spacing: 0;
+    }
+    input,
+    select {
+      min-height: 40px;
+      padding: 8px 10px;
+    }
+    textarea {
+      min-height: 124px;
+      padding: 10px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+    button {
+      min-height: 40px;
+      padding: 8px 12px;
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
+      font-weight: 720;
+      cursor: pointer;
+    }
+    button.secondary {
+      border-color: var(--blue);
+      background: #fff;
+      color: var(--blue);
+    }
+    button.ghost {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--text);
+    }
+    button.warn {
+      border-color: rgba(154, 91, 19, 0.5);
+      background: #fff;
+      color: var(--amber);
+    }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 12px;
+    }
+    .actions button {
+      width: auto;
+      min-width: 118px;
+    }
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      overflow-wrap: anywhere;
+    }
+    .link-list {
+      display: grid;
+      gap: 8px;
+    }
+    .link-row {
+      display: grid;
+      grid-template-columns: 94px minmax(0, 1fr) auto auto;
+      gap: 8px;
+      align-items: center;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-soft);
+    }
+    .link-row button {
+      min-width: 68px;
+      width: auto;
+      min-height: 34px;
+      padding: 6px 9px;
+    }
+    .qr-area {
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+    .qr-box {
+      display: grid;
+      place-items: center;
+      min-height: 230px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 880px;
+    }
+    th,
+    td {
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      font-size: 13px;
+      vertical-align: top;
+    }
+    th {
+      background: #eef3f8;
+      color: #43536a;
+      font-size: 12px;
+      font-weight: 740;
+    }
+    tr:last-child td {
+      border-bottom: 0;
+    }
+    .ok {
+      color: var(--brand-strong);
+      font-weight: 740;
+    }
+    .bad {
+      color: var(--red);
+      font-weight: 740;
+    }
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .state-box {
+      min-height: 126px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--panel-soft);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+    .direct-open {
+      max-width: 760px;
+      margin: 18vh auto 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 960px) {
+      .shell {
+        width: min(100% - 20px, 760px);
+        padding-top: 14px;
+      }
+      header,
+      .layout,
+      .split,
+      .qr-area {
+        grid-template-columns: 1fr;
+      }
+      header {
+        display: grid;
+      }
+      .grid,
+      .grid.three {
+        grid-template-columns: 1fr;
+      }
+      .link-row {
+        grid-template-columns: 1fr;
+      }
+      .link-row button {
+        width: 100%;
+      }
+      .actions button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="app" class="shell">
+    <header>
+      <div>
+        <h1>IP168 控制台</h1>
+        <div class="meta">
+          <span id="originPill" class="pill mono">Worker</span>
+          <span id="entryPill" class="pill mono">入口</span>
+          <span id="converterPill" class="pill mono">转换器</span>
+        </div>
+      </div>
+      <div id="status" class="status">正在连接 Worker 后台...</div>
+    </header>
+
+    <nav class="tabs" aria-label="控制台页面">
+      <button class="tab active" type="button" data-view="configView">配置</button>
+      <button class="tab" type="button" data-view="subView">订阅</button>
+      <button class="tab" type="button" data-view="proxyView">ProxyIP</button>
+      <button class="tab" type="button" data-view="autoView">自动维护</button>
+    </nav>
+
+    <section id="configView" class="view active">
+      <div class="layout">
+        <section class="panel">
+          <h2>基础配置</h2>
+          <div class="grid">
+            <label>Worker Host
+              <input id="host" spellcheck="false" autocomplete="off">
+            </label>
+            <label>Fingerprint
+              <select id="fingerprint">
+                <option value="chrome">chrome</option>
+                <option value="firefox">firefox</option>
+                <option value="safari">safari</option>
+                <option value="edge">edge</option>
+                <option value="ios">ios</option>
+                <option value="android">android</option>
+                <option value="random">random</option>
+              </select>
+            </label>
+          </div>
+          <label style="margin-top:12px">UUID
+            <input id="uuid" class="mono" spellcheck="false" autocomplete="off">
+          </label>
+          <div class="grid" style="margin-top:12px">
+            <label>订阅 token
+              <input id="token" class="mono" spellcheck="false" autocomplete="off">
+            </label>
+            <label>订阅名称
+              <input id="subName" spellcheck="false" autocomplete="off">
+            </label>
+          </div>
+          <label class="check" style="margin-top:12px">
+            <input id="echEnabled" type="checkbox">
+            启用 ECH 订阅参数
+          </label>
+          <div class="grid">
+            <label>ECH DNS
+              <input id="echDns" spellcheck="false" autocomplete="off">
+            </label>
+            <label>ECH SNI
+              <input id="echSni" spellcheck="false" autocomplete="off">
+            </label>
+          </div>
+          <div class="actions">
+            <button id="saveConfig" type="button">保存配置</button>
+            <button id="reloadState" class="secondary" type="button">重新读取</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>入口和反代</h2>
+          <label>Cloudflare entry endpoints (ADD.txt)
+            <textarea id="addText" class="mono" spellcheck="false"></textarea>
+          </label>
+          <div class="grid" style="margin-top:12px">
+            <label>Proxy mode
+              <select id="proxyMode">
+                <option value="proxy-only">Proxy only</option>
+                <option value="direct-only">Direct only</option>
+                <option value="proxy-first">Proxy first</option>
+                <option value="direct-first">Direct first</option>
+              </select>
+            </label>
+            <label>当前 PROXYIP 数量
+              <input id="proxyCount" readonly>
+            </label>
+          </div>
+          <label style="margin-top:12px">Landing relay endpoints (PROXYIP)
+            <textarea id="proxyip" class="mono" spellcheck="false"></textarea>
+          </label>
+          <div class="actions">
+            <button id="saveAll" type="button">保存全部</button>
+            <button id="refreshEntries" class="ghost" type="button">刷新 ADD</button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="subView" class="view">
+      <div class="layout">
+        <section class="panel">
+          <h2>订阅链接</h2>
+          <div id="links" class="link-list"></div>
+          <p class="hint">复制给客户端后，由客户端访问你自己的 Worker 订阅地址；Clash 和 Sing-box 格式由转换接口实时生成。</p>
+        </section>
+
+        <section class="panel">
+          <h2>二维码</h2>
+          <div class="qr-area">
+            <div class="qr-box">
+              <canvas id="qrCanvas" width="220" height="220"></canvas>
+            </div>
+            <div>
+              <label>当前二维码内容
+                <textarea id="qrText" class="mono" readonly></textarea>
+              </label>
+              <div class="actions">
+                <button id="copyQrText" class="secondary" type="button">复制当前链接</button>
+                <button id="openSub" class="ghost" type="button">打开链接</button>
+              </div>
+              <p id="qrHint" class="hint">选择订阅格式后显示二维码。</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="proxyView" class="view">
+      <section class="panel flat">
+        <h2>中央库小批量拉取</h2>
+        <div class="grid three">
+          <label>国家
+            <select id="countrySelect"><option value="">加载中</option></select>
+          </label>
+          <label>端口
+            <select id="portSelect"><option value="">全部</option></select>
+          </label>
+          <label>状态
+            <select id="statusSelect">
+              <option value="verified,usable">verified + usable</option>
+              <option value="verified">verified</option>
+              <option value="usable">usable</option>
+              <option value="all">全部</option>
+            </select>
+          </label>
+          <label>拉取数量
+            <input id="limitInput" type="number" min="1" max="100" value="50">
+          </label>
+          <label>测速超时(ms)
+            <input id="timeoutMs" type="number" min="1000" max="8000" value="3500">
+          </label>
+          <label>并发
+            <input id="concurrency" type="number" min="1" max="8" value="4">
+          </label>
+        </div>
+        <div class="actions">
+          <button id="loadCandidates" type="button">拉取候选</button>
+          <button id="probeSelected" class="secondary" type="button" disabled>测试选中</button>
+          <button id="selectOk" class="ghost" type="button" disabled>只保留可用</button>
+          <button id="saveSelected" class="warn" type="button" disabled>写入 PROXYIP</button>
+        </div>
+        <p id="candidateStatus" class="hint">中央库每次最多拉取 100 条，测速走当前用户自己的 Worker。</p>
+      </section>
+
+      <section class="panel">
+        <div class="actions" style="margin-top:0;margin-bottom:10px">
+          <label class="check">
+            <input id="toggleAll" type="checkbox">
+            全选当前候选
+          </label>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:46px">选</th>
+                <th>ProxyIP</th>
+                <th>国家</th>
+                <th>位置/ASN</th>
+                <th>库延迟</th>
+                <th>当前测速</th>
+                <th>落地</th>
+              </tr>
+            </thead>
+            <tbody id="tbody">
+              <tr><td colspan="7" class="hint">暂无候选。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section id="autoView" class="view">
+      <div class="split">
+        <section class="panel">
+          <h2>自动维护设置</h2>
+          <div class="grid">
+            <label class="check">
+              <input id="autoEnabled" type="checkbox">
+              启用定时自动维护
+            </label>
+            <label class="check">
+              <input id="keepCurrentIfHealthy" type="checkbox">
+              当前可用时保留
+            </label>
+            <label class="check">
+              <input id="requireCountryMatch" type="checkbox">
+              要求落地匹配国家
+            </label>
+            <label class="check">
+              <input id="autoHealOnAllFailed" type="checkbox">
+              全失败时自愈
+            </label>
+          </div>
+          <div class="grid three" style="margin-top:12px">
+            <label>国家
+              <input id="autoCountry" maxlength="2" spellcheck="false">
+            </label>
+            <label>端口
+              <input id="autoPort" inputmode="numeric" spellcheck="false">
+            </label>
+            <label>状态
+              <select id="autoStatus">
+                <option value="verified,usable">verified + usable</option>
+                <option value="verified">verified</option>
+                <option value="usable">usable</option>
+                <option value="all">全部</option>
+              </select>
+            </label>
+            <label>候选数量
+              <input id="autoCandidateLimit" type="number" min="1" max="50">
+            </label>
+            <label>写入数量
+              <input id="autoSaveCount" type="number" min="1" max="10">
+            </label>
+            <label>失败阈值
+              <input id="failureThreshold" type="number" min="1" max="10">
+            </label>
+            <label>测速超时(ms)
+              <input id="autoTimeoutMs" type="number" min="1000" max="8000">
+            </label>
+            <label>并发
+              <input id="autoConcurrency" type="number" min="1" max="8">
+            </label>
+            <label>自愈冷却(分钟)
+              <input id="autoHealCooldownMinutes" type="number" min="1" max="120">
+            </label>
+            <label>备用组数
+              <input id="standbyGroupCount" type="number" min="1" max="5">
+            </label>
+            <label>每组数量
+              <input id="standbyGroupSize" type="number" min="1" max="5">
+            </label>
+          </div>
+          <div class="actions">
+            <button id="saveAuto" type="button">保存自动维护</button>
+            <button id="runAuto" class="secondary" type="button">立即运行</button>
+            <button id="forceReplace" class="warn" type="button">强制换一组</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>自动维护状态</h2>
+          <div id="autoState" class="state-box">未读取。</div>
+          <h3 style="margin-top:14px">当前 PROXYIP</h3>
+          <div id="currentProxyip" class="state-box mono"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://furulei.github.io/cf/vendor/qrcode.min.js"></script>
+  <script>
+    const injected = window.IP168_BOOTSTRAP;
+    const app = document.getElementById("app");
+    const statusEl = document.getElementById("status");
+
+    if (!injected) {
+      app.innerHTML = '<section class="direct-open"><h1>IP168 控制台</h1><p>请通过你自己的 Worker 后台入口打开本页。直接访问 GitHub 静态页面时，页面没有用户 Worker 的接口信息，不能读取或保存配置。</p></section>';
+      throw new Error("IP168 bootstrap is missing");
+    }
+
+    const PROXY_KEY = "\u53cd\u4ee3";
+    const SUB_KEY = "\u4f18\u9009\u8ba2\u9605\u751f\u6210";
+    const bootstrap = injected;
+    const state = {
+      config: null,
+      addText: "",
+      auto: { settings: {}, state: {} },
+      currentProxyip: "",
+      nodes: [],
+      selected: new Set(),
+      probe: new Map(),
+      links: {},
+      qrUrl: ""
+    };
+
+    const fields = {
+      host: document.getElementById("host"),
+      uuid: document.getElementById("uuid"),
+      token: document.getElementById("token"),
+      subName: document.getElementById("subName"),
+      fingerprint: document.getElementById("fingerprint"),
+      echEnabled: document.getElementById("echEnabled"),
+      echDns: document.getElementById("echDns"),
+      echSni: document.getElementById("echSni"),
+      addText: document.getElementById("addText"),
+      proxyMode: document.getElementById("proxyMode"),
+      proxyip: document.getElementById("proxyip"),
+      proxyCount: document.getElementById("proxyCount"),
+      autoEnabled: document.getElementById("autoEnabled"),
+      keepCurrentIfHealthy: document.getElementById("keepCurrentIfHealthy"),
+      requireCountryMatch: document.getElementById("requireCountryMatch"),
+      autoHealOnAllFailed: document.getElementById("autoHealOnAllFailed"),
+      autoCountry: document.getElementById("autoCountry"),
+      autoPort: document.getElementById("autoPort"),
+      autoStatus: document.getElementById("autoStatus"),
+      autoCandidateLimit: document.getElementById("autoCandidateLimit"),
+      autoSaveCount: document.getElementById("autoSaveCount"),
+      failureThreshold: document.getElementById("failureThreshold"),
+      autoTimeoutMs: document.getElementById("autoTimeoutMs"),
+      autoConcurrency: document.getElementById("autoConcurrency"),
+      autoHealCooldownMinutes: document.getElementById("autoHealCooldownMinutes"),
+      standbyGroupCount: document.getElementById("standbyGroupCount"),
+      standbyGroupSize: document.getElementById("standbyGroupSize")
+    };
+
+    function setStatus(text, type) {
+      statusEl.textContent = text || "";
+      statusEl.className = "status" + (type ? " " + type : "");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[ch]);
+    }
+
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value || {}));
+    }
+
+    function countList(text) {
+      return String(text || "").split(/[\s,]+/).map((item) => item.trim()).filter(Boolean).length;
+    }
+
+    function endpointOf(node) {
+      return node?.proxy || (node?.ip && node?.port ? node.ip + ":" + node.port : "");
+    }
+
+    function normalizedNumber(input, fallback, min, max) {
+      const value = Number(input.value);
+      if (!Number.isFinite(value)) return fallback;
+      return Math.max(min, Math.min(max, Math.round(value)));
+    }
+
+    async function readJson(response) {
+      const text = await response.text();
+      let data;
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        throw new Error(response.redirected ? "登录状态失效，请重新进入后台" : "响应不是 JSON");
+      }
+      if (!response.ok) {
+        throw new Error(data.error || data.message || ("HTTP " + response.status));
+      }
+      return data;
+    }
+
+    async function api(url, options) {
+      const response = await fetch(url, {
+        credentials: "same-origin",
+        cache: "no-store",
+        ...options
+      });
+      return readJson(response);
+    }
+
+    async function catalogJson(url) {
+      const response = await fetch(url, { cache: "no-store" });
+      return readJson(response);
+    }
+
+    async function postJson(url, body) {
+      return api(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+    }
+
+    function fillForm(config, addText) {
+      const proxy = config[PROXY_KEY] || {};
+      const sub = config[SUB_KEY] || {};
+      const ech = config.ECHConfig || {};
+      fields.host.value = config.HOST || "";
+      fields.uuid.value = config.UUID || "";
+      fields.token.value = sub.TOKEN || "";
+      fields.subName.value = sub.SUBNAME || "edgetunnel";
+      fields.fingerprint.value = config.Fingerprint || "chrome";
+      fields.echEnabled.checked = Boolean(config.ECH);
+      fields.echDns.value = ech.DNS || "";
+      fields.echSni.value = ech.SNI || "";
+      fields.addText.value = addText || "";
+      fields.proxyMode.value = proxy.Mode || "proxy-only";
+      fields.proxyip.value = proxy.PROXYIP || "";
+      fields.proxyCount.value = countList(proxy.PROXYIP || "");
+      renderLinks();
+    }
+
+    function readConfigFromForm() {
+      const config = clone(state.config);
+      const proxy = { ...(config[PROXY_KEY] || {}) };
+      const sub = { ...(config[SUB_KEY] || {}) };
+      config.HOST = fields.host.value.trim();
+      config.HOSTS = config.HOST ? [config.HOST] : [];
+      config.UUID = fields.uuid.value.trim();
+      config.Fingerprint = fields.fingerprint.value;
+      config.ECH = fields.echEnabled.checked;
+      config.ECHConfig = {
+        ...(config.ECHConfig || {}),
+        DNS: fields.echDns.value.trim(),
+        SNI: fields.echSni.value.trim()
+      };
+      proxy.Mode = fields.proxyMode.value;
+      proxy.PROXYIP = fields.proxyip.value.trim();
+      sub.TOKEN = fields.token.value.trim();
+      sub.SUBNAME = fields.subName.value.trim() || "edgetunnel";
+      config[PROXY_KEY] = proxy;
+      config[SUB_KEY] = sub;
+      return config;
+    }
+
+    function makeSubLink(flag) {
+      const token = fields.token.value.trim();
+      if (!token) return "";
+      const url = new URL(bootstrap.subPath, bootstrap.workerOrigin);
+      url.searchParams.set("token", token);
+      return flag ? url.href + "&" + flag : url.href;
+    }
+
+    function renderLinks() {
+      state.links = {
+        Mixed: makeSubLink(""),
+        Base64: makeSubLink("b64"),
+        Clash: makeSubLink("clash"),
+        "Sing-box": makeSubLink("sb")
+      };
+      const links = document.getElementById("links");
+      links.innerHTML = Object.entries(state.links).map(([name, value]) => `
+        <div class="link-row">
+          <strong>${escapeHtml(name)}</strong>
+          <span class="mono">${escapeHtml(value || "请先填写订阅 token")}</span>
+          <button class="secondary" type="button" data-copy="${escapeHtml(name)}" ${value ? "" : "disabled"}>复制</button>
+          <button class="ghost" type="button" data-qr="${escapeHtml(name)}" ${value ? "" : "disabled"}>二维码</button>
+        </div>
+      `).join("");
+      links.querySelectorAll("[data-copy]").forEach((button) => {
+        button.addEventListener("click", () => copyText(state.links[button.dataset.copy]));
+      });
+      links.querySelectorAll("[data-qr]").forEach((button) => {
+        button.addEventListener("click", () => renderQr(state.links[button.dataset.qr], button.dataset.qr));
+      });
+      if (!state.qrUrl && state.links.Mixed) {
+        renderQr(state.links.Mixed, "Mixed");
+      }
+    }
+
+    function renderQr(value, label) {
+      state.qrUrl = value || "";
+      const canvas = document.getElementById("qrCanvas");
+      const text = document.getElementById("qrText");
+      const hint = document.getElementById("qrHint");
+      text.value = state.qrUrl;
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!state.qrUrl) {
+        hint.textContent = "没有可生成二维码的订阅链接。";
+        return;
+      }
+      if (!window.QRCode) {
+        hint.textContent = "二维码库未加载，链接仍可复制。";
+        return;
+      }
+      window.QRCode.toCanvas(canvas, state.qrUrl, {
+        width: 220,
+        margin: 1,
+        errorCorrectionLevel: "M"
+      }, (error) => {
+        hint.textContent = error ? "二维码生成失败。" : label + " 二维码";
+      });
+    }
+
+    async function copyText(value) {
+      if (!value) return;
+      try {
+        await navigator.clipboard.writeText(value);
+        setStatus("已复制。", "ok");
+      } catch {
+        window.prompt("复制链接", value);
+      }
+    }
+
+    async function loadState() {
+      setStatus("正在读取配置...");
+      const data = await api(bootstrap.endpoints.state);
+      state.config = data.config || {};
+      state.addText = data.addText || "";
+      state.auto = data.proxyAuto || { settings: {}, state: {} };
+      fillForm(state.config, state.addText);
+      fillAutoForm(state.auto.settings || {});
+      renderAutoState(state.auto.state || {}, "");
+      setStatus("配置已读取。", "ok");
+    }
+
+    async function saveAll() {
+      setStatus("正在保存配置...");
+      const config = readConfigFromForm();
+      const data = await postJson(bootstrap.endpoints.save, {
+        config,
+        addText: fields.addText.value
+      });
+      state.config = data.config || config;
+      state.addText = data.addText || fields.addText.value;
+      fillForm(state.config, state.addText);
+      setStatus("配置已保存。", "ok");
+    }
+
+    async function refreshEntries() {
+      const data = await api(bootstrap.endpoints.entries);
+      state.addText = data.addText || "";
+      fields.addText.value = state.addText;
+      setStatus("ADD 已刷新。", "ok");
+    }
+
+    function renderCandidates() {
+      const tbody = document.getElementById("tbody");
+      if (!state.nodes.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="hint">暂无候选。</td></tr>';
+        document.getElementById("probeSelected").disabled = true;
+        document.getElementById("selectOk").disabled = true;
+        document.getElementById("saveSelected").disabled = true;
+        return;
+      }
+      tbody.innerHTML = state.nodes.map((node) => {
+        const proxy = endpointOf(node);
+        const probe = state.probe.get(proxy);
+        const place = [node.region, node.city, node.org, node.asn].filter(Boolean).join(" / ") || "-";
+        const latency = node.latencyMs == null ? "-" : node.latencyMs + "ms";
+        const probeText = probe
+          ? probe.ok
+            ? '<span class="ok">' + escapeHtml((probe.connectMs ?? "-") + "ms / " + (probe.traceMs ?? "-") + "ms") + '</span>'
+            : '<span class="bad">' + escapeHtml(probe.error || "失败") + '</span>'
+          : "-";
+        const landing = probe && probe.ok ? [probe.exitIp, probe.loc, probe.colo].filter(Boolean).join(" / ") : "-";
+        const checked = state.selected.has(proxy) ? "checked" : "";
+        return `<tr>
+          <td><input data-pick="${escapeHtml(proxy)}" type="checkbox" ${checked}></td>
+          <td class="mono">${escapeHtml(proxy)}</td>
+          <td>${escapeHtml(node.country || "-")}</td>
+          <td>${escapeHtml(place)}</td>
+          <td>${escapeHtml(latency)}</td>
+          <td>${probeText}</td>
+          <td class="mono">${escapeHtml(landing)}</td>
+        </tr>`;
+      }).join("");
+      document.getElementById("probeSelected").disabled = !state.selected.size;
+      document.getElementById("selectOk").disabled = !Array.from(state.probe.values()).some((item) => item.ok);
+      document.getElementById("saveSelected").disabled = !state.selected.size;
+      document.getElementById("toggleAll").checked = state.nodes.length > 0 && state.nodes.every((node) => state.selected.has(endpointOf(node)));
+    }
+
+    async function loadSummary() {
+      const data = await catalogJson(bootstrap.catalog.summaryUrl);
+      const countrySelect = document.getElementById("countrySelect");
+      const portSelect = document.getElementById("portSelect");
+      const countries = Array.isArray(data.countries) ? data.countries : [];
+      const ports = Array.isArray(data.ports) ? data.ports : [];
+      countrySelect.innerHTML = '<option value="">全部国家</option>' + countries.map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.code + " (" + item.count + ")")}</option>`).join("");
+      portSelect.innerHTML = '<option value="">全部端口</option>' + ports.map((item) => `<option value="${escapeHtml(item.port)}">${escapeHtml(item.port + " (" + item.count + ")")}</option>`).join("");
+      document.getElementById("candidateStatus").textContent = "中央库总量 " + (data.total || 0) + " 条；页面只按条件小批量拉取。";
+    }
+
+    async function loadCandidates() {
+      const url = new URL(bootstrap.catalog.queryUrl);
+      const country = document.getElementById("countrySelect").value;
+      const port = document.getElementById("portSelect").value;
+      const status = document.getElementById("statusSelect").value;
+      const limit = normalizedNumber(document.getElementById("limitInput"), 50, 1, 100);
+      if (country) url.searchParams.set("country", country);
+      if (port) url.searchParams.set("port", port);
+      if (status) url.searchParams.set("status", status);
+      url.searchParams.set("limit", String(limit));
+      setStatus("正在拉取候选...");
+      const data = await catalogJson(url.href);
+      state.nodes = Array.isArray(data.nodes) ? data.nodes : [];
+      state.probe.clear();
+      state.selected = new Set(state.nodes.map(endpointOf).filter(Boolean));
+      document.getElementById("candidateStatus").textContent = "候选 " + state.nodes.length + " 条，可用池匹配 " + (data.total_available ?? "-") + " 条。";
+      renderCandidates();
+      setStatus("候选已拉取。", "ok");
+    }
+
+    async function probeSelected() {
+      const targets = Array.from(state.selected);
+      if (!targets.length) return;
+      setStatus("正在测速 " + targets.length + " 条...");
+      const data = await postJson(bootstrap.endpoints.proxyTest, {
+        targets,
+        timeoutMs: normalizedNumber(document.getElementById("timeoutMs"), 3500, 1000, 8000),
+        concurrency: normalizedNumber(document.getElementById("concurrency"), 4, 1, 8)
+      });
+      (data.results || []).forEach((item) => state.probe.set(item.proxy, item));
+      renderCandidates();
+      setStatus("测速完成，可用 " + (data.ok || 0) + " / " + (data.count || 0) + "。", "ok");
+    }
+
+    function selectOk() {
+      state.selected = new Set(Array.from(state.probe.entries()).filter(([, result]) => result.ok).map(([proxy]) => proxy));
+      renderCandidates();
+    }
+
+    async function saveSelectedProxyip() {
+      const selected = Array.from(state.selected);
+      if (!selected.length) return;
+      fields.proxyip.value = selected.join(",");
+      fields.proxyCount.value = selected.length;
+      await saveAll();
+      setStatus("已写入 " + selected.length + " 条 PROXYIP。", "ok");
+    }
+
+    function fillAutoForm(settings) {
+      fields.autoEnabled.checked = Boolean(settings.enabled);
+      fields.keepCurrentIfHealthy.checked = settings.keepCurrentIfHealthy !== false;
+      fields.requireCountryMatch.checked = settings.requireCountryMatch !== false;
+      fields.autoHealOnAllFailed.checked = settings.autoHealOnAllFailed !== false;
+      fields.autoCountry.value = settings.country || "US";
+      fields.autoPort.value = settings.port || "";
+      fields.autoStatus.value = settings.status || "verified,usable";
+      fields.autoCandidateLimit.value = settings.candidateLimit ?? 50;
+      fields.autoSaveCount.value = settings.saveCount ?? 3;
+      fields.failureThreshold.value = settings.failureThreshold ?? 3;
+      fields.autoTimeoutMs.value = settings.timeoutMs ?? 8000;
+      fields.autoConcurrency.value = settings.concurrency ?? 4;
+      fields.autoHealCooldownMinutes.value = settings.autoHealCooldownMinutes ?? 10;
+      fields.standbyGroupCount.value = settings.standbyGroupCount ?? 2;
+      fields.standbyGroupSize.value = settings.standbyGroupSize ?? 3;
+    }
+
+    function readAutoSettings() {
+      return {
+        enabled: fields.autoEnabled.checked,
+        keepCurrentIfHealthy: fields.keepCurrentIfHealthy.checked,
+        requireCountryMatch: fields.requireCountryMatch.checked,
+        autoHealOnAllFailed: fields.autoHealOnAllFailed.checked,
+        country: fields.autoCountry.value.trim().toUpperCase(),
+        port: fields.autoPort.value.trim(),
+        status: fields.autoStatus.value,
+        candidateLimit: normalizedNumber(fields.autoCandidateLimit, 50, 1, 50),
+        saveCount: normalizedNumber(fields.autoSaveCount, 3, 1, 10),
+        failureThreshold: normalizedNumber(fields.failureThreshold, 3, 1, 10),
+        timeoutMs: normalizedNumber(fields.autoTimeoutMs, 8000, 1000, 8000),
+        concurrency: normalizedNumber(fields.autoConcurrency, 4, 1, 8),
+        autoHealCooldownMinutes: normalizedNumber(fields.autoHealCooldownMinutes, 10, 1, 120),
+        standbyGroupCount: normalizedNumber(fields.standbyGroupCount, 2, 1, 5),
+        standbyGroupSize: normalizedNumber(fields.standbyGroupSize, 3, 1, 5)
+      };
+    }
+
+    function renderAutoState(autoState, currentProxyip) {
+      const lines = [
+        "enabled: " + Boolean(fields.autoEnabled.checked),
+        "lastRunAt: " + (autoState.lastRunAt || "-"),
+        "lastResult: " + (autoState.lastResult || autoState.action || "-"),
+        "reason: " + (autoState.reason || autoState.autoHealReason || "-"),
+        "currentFailureCount: " + (autoState.currentFailureCount ?? "-"),
+        "standbyGroups: " + (Array.isArray(autoState.standbyGroups) ? autoState.standbyGroups.length : 0),
+        "nextStandbyGroupIndex: " + (autoState.nextStandbyGroupIndex ?? "-")
+      ];
+      document.getElementById("autoState").textContent = lines.join("\n");
+      document.getElementById("currentProxyip").textContent = currentProxyip || state.currentProxyip || "";
+    }
+
+    async function saveAuto() {
+      setStatus("正在保存自动维护设置...");
+      const data = await postJson(bootstrap.endpoints.proxyAuto, readAutoSettings());
+      state.auto = { settings: data.settings || {}, state: data.state || {} };
+      fillAutoForm(state.auto.settings);
+      renderAutoState(state.auto.state, "");
+      setStatus("自动维护设置已保存。", "ok");
+    }
+
+    async function runAuto(forceReplace) {
+      setStatus(forceReplace ? "正在强制换一组..." : "正在运行自动维护...");
+      const data = await postJson(bootstrap.endpoints.proxyRun, {
+        forceEnabled: true,
+        forceReplace: Boolean(forceReplace)
+      });
+      if (data.config) {
+        state.config = data.config;
+        fillForm(state.config, state.addText);
+      }
+      if (data.state) {
+        state.auto.state = data.state;
+      }
+      renderAutoState(state.auto.state || {}, data.currentProxyip || "");
+      setStatus("自动维护运行完成。", "ok");
+    }
+
+    function bindEvents() {
+      document.querySelectorAll(".tab").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
+          document.querySelectorAll(".view").forEach((item) => item.classList.remove("active"));
+          button.classList.add("active");
+          document.getElementById(button.dataset.view).classList.add("active");
+        });
+      });
+      document.getElementById("saveConfig").addEventListener("click", () => saveAll().catch(showError));
+      document.getElementById("saveAll").addEventListener("click", () => saveAll().catch(showError));
+      document.getElementById("reloadState").addEventListener("click", () => loadState().catch(showError));
+      document.getElementById("refreshEntries").addEventListener("click", () => refreshEntries().catch(showError));
+      document.getElementById("loadCandidates").addEventListener("click", () => loadCandidates().catch(showError));
+      document.getElementById("probeSelected").addEventListener("click", () => probeSelected().catch(showError));
+      document.getElementById("selectOk").addEventListener("click", selectOk);
+      document.getElementById("saveSelected").addEventListener("click", () => saveSelectedProxyip().catch(showError));
+      document.getElementById("copyQrText").addEventListener("click", () => copyText(state.qrUrl));
+      document.getElementById("openSub").addEventListener("click", () => {
+        if (state.qrUrl) window.open(state.qrUrl, "_blank", "noopener,noreferrer");
+      });
+      document.getElementById("saveAuto").addEventListener("click", () => saveAuto().catch(showError));
+      document.getElementById("runAuto").addEventListener("click", () => runAuto(false).catch(showError));
+      document.getElementById("forceReplace").addEventListener("click", () => runAuto(true).catch(showError));
+      document.getElementById("toggleAll").addEventListener("change", (event) => {
+        state.selected = event.target.checked ? new Set(state.nodes.map(endpointOf).filter(Boolean)) : new Set();
+        renderCandidates();
+      });
+      document.getElementById("tbody").addEventListener("change", (event) => {
+        const proxy = event.target?.dataset?.pick;
+        if (!proxy) return;
+        if (event.target.checked) state.selected.add(proxy);
+        else state.selected.delete(proxy);
+        renderCandidates();
+      });
+      ["token", "subName", "host", "uuid", "fingerprint", "proxyMode", "proxyip"].forEach((id) => {
+        fields[id]?.addEventListener("input", () => {
+          fields.proxyCount.value = countList(fields.proxyip.value);
+          renderLinks();
+        });
+      });
+    }
+
+    function showError(error) {
+      setStatus(error.message || String(error), "error");
+    }
+
+    document.getElementById("originPill").textContent = bootstrap.workerOrigin;
+    document.getElementById("entryPill").textContent = bootstrap.adminBase;
+    document.getElementById("converterPill").textContent = bootstrap.converterUrl || "converter";
+
+    bindEvents();
+    loadState().then(() => loadSummary()).catch(showError);
+  </script>
+</body>
+</html>
