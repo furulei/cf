@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IP168 订阅生成</title>
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --line: #d9dee7;
+      --text: #1c2430;
+      --muted: #687386;
+      --brand: #117a65;
+      --brand-strong: #0b5d4b;
+      --accent: #365da8;
+      --warn: #a85d12;
+      --bad: #b42318;
+      --shadow: 0 14px 36px rgba(28, 36, 48, 0.08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .shell {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 40px;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.2;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+    .status {
+      min-height: 40px;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      max-width: 480px;
+    }
+    .status.ok {
+      color: var(--brand-strong);
+      border-color: rgba(17, 122, 101, 0.32);
+    }
+    .status.error {
+      color: var(--bad);
+      border-color: rgba(180, 35, 24, 0.32);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+    .panel h2 {
+      margin: 0;
+      padding: 18px 18px 0;
+      font-size: 18px;
+      font-weight: 720;
+      letter-spacing: 0;
+    }
+    .form {
+      padding: 16px 18px 18px;
+      display: grid;
+      gap: 14px;
+    }
+    label {
+      display: grid;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 650;
+      color: #2d3748;
+    }
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid #c9d1dd;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      padding: 9px 11px;
+      font: inherit;
+      outline: none;
+    }
+    textarea {
+      min-height: 76px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(54, 93, 168, 0.14);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding-top: 4px;
+    }
+    button {
+      min-height: 40px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 8px 13px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      background: #eef2f7;
+      color: #253044;
+    }
+    button.primary {
+      background: var(--brand);
+      color: #fff;
+    }
+    button.primary:hover {
+      background: var(--brand-strong);
+    }
+    button:hover {
+      border-color: #b9c4d2;
+    }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+    .links {
+      padding: 16px 18px 18px;
+      display: grid;
+      gap: 12px;
+    }
+    .link-row {
+      display: grid;
+      grid-template-columns: 130px minmax(0, 1fr) auto auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfe;
+    }
+    .link-row strong {
+      font-size: 14px;
+    }
+    .link-row input {
+      min-height: 38px;
+      font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+    .link-row button {
+      min-width: 64px;
+      min-height: 38px;
+      padding: 7px 10px;
+      white-space: nowrap;
+    }
+    .qr-wrap {
+      padding: 16px 18px 18px;
+      display: grid;
+      grid-template-columns: minmax(180px, 240px) 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .qr-box {
+      width: 240px;
+      height: 240px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      display: grid;
+      place-items: center;
+    }
+    .qr-box canvas {
+      width: 220px;
+      height: 220px;
+    }
+    .mini {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    .hint {
+      color: var(--warn);
+      font-size: 13px;
+      margin: 0;
+    }
+    @media (max-width: 900px) {
+      header,
+      .grid,
+      .qr-wrap {
+        grid-template-columns: 1fr;
+      }
+      header {
+        align-items: stretch;
+        flex-direction: column;
+      }
+      .status {
+        max-width: none;
+      }
+      .link-row {
+        grid-template-columns: 1fr;
+      }
+      .link-row button {
+        width: 100%;
+      }
+      .qr-box {
+        width: 100%;
+        max-width: 260px;
+        height: 260px;
+      }
+    }
+    @media (max-width: 560px) {
+      .shell {
+        width: min(100vw - 20px, 1180px);
+        padding-top: 14px;
+      }
+      h1 {
+        font-size: 23px;
+      }
+      .row {
+        grid-template-columns: 1fr;
+      }
+      .panel h2,
+      .form,
+      .links,
+      .qr-wrap {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <h1>IP168 订阅生成</h1>
+      <div id="status" class="status">等待输入后台地址</div>
+    </header>
+
+    <section class="grid">
+      <div class="panel">
+        <h2>配置</h2>
+        <div class="form">
+          <label>
+            后台地址
+            <input id="adminUrl" autocomplete="off" spellcheck="false" value="https://a.ip168.dpdns.org/a">
+          </label>
+          <label>
+            后台密码
+            <input id="adminPassword" type="password" autocomplete="current-password" placeholder="ADMIN">
+          </label>
+          <div class="row">
+            <label>
+              Worker Host
+              <input id="workerHost" autocomplete="off" spellcheck="false" placeholder="a.ip168.dpdns.org">
+            </label>
+            <label>
+              订阅 token
+              <input id="subToken" autocomplete="off" spellcheck="false">
+            </label>
+          </div>
+          <label>
+            转换器地址
+            <input id="converterUrl" autocomplete="off" spellcheck="false" value="https://sub.ip168.dpdns.org">
+          </label>
+          <div class="row">
+            <label>
+              规则模板
+              <select id="rules">
+                <option value="minimal">minimal</option>
+                <option value="balanced" selected>balanced</option>
+                <option value="comprehensive">comprehensive</option>
+              </select>
+            </label>
+            <label>
+              二维码
+              <select id="qrTarget">
+                <option value="karing">Karing</option>
+                <option value="clash">Clash/Mihomo</option>
+                <option value="singbox">Sing-box</option>
+                <option value="xray">Xray/V2Ray</option>
+                <option value="surge">Surge</option>
+              </select>
+            </label>
+          </div>
+          <div class="actions">
+            <button id="loadConfig" class="primary" type="button">读取后台</button>
+            <button id="buildLinks" type="button">生成链接</button>
+            <button id="clearSaved" type="button">清空</button>
+          </div>
+          <p class="mini">密码只用于本次读取后台配置，不写入本地保存。</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>链接</h2>
+        <div id="links" class="links"></div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:18px">
+      <h2>二维码</h2>
+      <div class="qr-wrap">
+        <div class="qr-box"><canvas id="qrCanvas" width="220" height="220"></canvas></div>
+        <div>
+          <textarea id="qrText" readonly spellcheck="false"></textarea>
+          <p id="qrHint" class="hint" style="margin-top:10px">生成链接后显示二维码。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./vendor/qrcode.min.js"></script>
+  <script>
+    const DEFAULT_CONVERTER = "https://sub.ip168.dpdns.org";
+    const fields = {
+      adminUrl: document.getElementById("adminUrl"),
+      adminPassword: document.getElementById("adminPassword"),
+      workerHost: document.getElementById("workerHost"),
+      subToken: document.getElementById("subToken"),
+      converterUrl: document.getElementById("converterUrl"),
+      rules: document.getElementById("rules"),
+      qrTarget: document.getElementById("qrTarget")
+    };
+    const statusEl = document.getElementById("status");
+    const linksEl = document.getElementById("links");
+    const qrCanvas = document.getElementById("qrCanvas");
+    const qrText = document.getElementById("qrText");
+    const qrHint = document.getElementById("qrHint");
+    let currentLinks = {};
+
+    restoreSaved();
+    renderLinks({});
+
+    document.getElementById("loadConfig").addEventListener("click", loadConfig);
+    document.getElementById("buildLinks").addEventListener("click", () => {
+      try {
+        buildAndRender();
+        setStatus("链接已生成", "ok");
+      } catch (error) {
+        setStatus(error.message || String(error), "error");
+      }
+    });
+    document.getElementById("clearSaved").addEventListener("click", clearSaved);
+    fields.qrTarget.addEventListener("change", renderQr);
+    fields.converterUrl.addEventListener("change", saveSafeState);
+    fields.adminUrl.addEventListener("change", saveSafeState);
+    fields.rules.addEventListener("change", saveSafeState);
+
+    async function loadConfig() {
+      try {
+        setStatus("正在读取后台配置", "");
+        const adminBase = normalizeUrl(fields.adminUrl.value);
+        const password = fields.adminPassword.value.trim();
+        if (!password) throw new Error("请输入后台密码");
+        const url = adminBase.replace(/\/+$/, "") + "/config.json";
+        const response = await fetch(url, {
+          method: "GET",
+          cache: "no-store",
+          headers: { "X-Admin-Password": password }
+        });
+        if (!response.ok) throw new Error("后台读取失败: " + response.status);
+        const config = await response.json();
+        const sub = config["优选订阅生成"] || {};
+        fields.workerHost.value = config.HOST || new URL(adminBase).hostname;
+        fields.subToken.value = sub.TOKEN || "";
+        if (!fields.subToken.value) throw new Error("后台配置里没有订阅 token");
+        saveSafeState();
+        buildAndRender();
+        setStatus("后台配置已读取", "ok");
+      } catch (error) {
+        setStatus(error.message || String(error), "error");
+      }
+    }
+
+    function buildAndRender() {
+      currentLinks = buildLinks({
+        workerHost: fields.workerHost.value,
+        token: fields.subToken.value,
+        converterOrigin: fields.converterUrl.value || DEFAULT_CONVERTER,
+        rules: fields.rules.value
+      });
+      renderLinks(currentLinks);
+      renderQr();
+    }
+
+    function buildLinks(input) {
+      const workerOrigin = normalizeWorkerOrigin(input.workerHost);
+      const token = String(input.token || "").trim();
+      if (!token) throw new Error("缺少订阅 token");
+      const converter = normalizeUrl(input.converterOrigin || DEFAULT_CONVERTER).replace(/\/+$/, "");
+      const source = workerOrigin + "/sub?token=" + encodeURIComponent(token);
+      const sourceB64 = source + "&b64";
+      const rules = input.rules || "balanced";
+      return {
+        karing: sourceB64,
+        clash: converter + "/clash?" + new URLSearchParams({
+          config: sourceB64,
+          selectedRules: rules,
+          group_by_country: "true"
+        }).toString(),
+        singbox: converter + "/singbox?" + new URLSearchParams({
+          config: sourceB64,
+          selectedRules: rules,
+          group_by_country: "true"
+        }).toString(),
+        xray: converter + "/xray?" + new URLSearchParams({ config: sourceB64 }).toString(),
+        surge: converter + "/surge?" + new URLSearchParams({
+          config: sourceB64,
+          selectedRules: rules,
+          group_by_country: "true"
+        }).toString()
+      };
+    }
+
+    function renderLinks(links) {
+      const rows = [
+        ["karing", "Karing", links.karing],
+        ["clash", "Clash/Mihomo", links.clash],
+        ["singbox", "Sing-box", links.singbox],
+        ["xray", "Xray/V2Ray", links.xray],
+        ["surge", "Surge", links.surge]
+      ];
+      linksEl.innerHTML = rows.map(([key, label, value]) => `
+        <div class="link-row">
+          <strong>${label}</strong>
+          <input id="link-${key}" readonly spellcheck="false" value="${escapeAttr(value || "")}">
+          <button type="button" data-copy="${key}" ${value ? "" : "disabled"}>复制</button>
+          <button type="button" data-qr="${key}" ${value ? "" : "disabled"}>二维码</button>
+        </div>
+      `).join("");
+      linksEl.querySelectorAll("[data-copy]").forEach(button => {
+        button.addEventListener("click", () => copyLink(button.dataset.copy));
+      });
+      linksEl.querySelectorAll("[data-qr]").forEach(button => {
+        button.addEventListener("click", () => {
+          fields.qrTarget.value = button.dataset.qr;
+          renderQr();
+        });
+      });
+    }
+
+    async function copyLink(key) {
+      const value = currentLinks[key];
+      if (!value) return;
+      try {
+        await navigator.clipboard.writeText(value);
+        setStatus("已复制 " + key, "ok");
+      } catch {
+        const input = document.getElementById("link-" + key);
+        input.focus();
+        input.select();
+        document.execCommand("copy");
+        setStatus("已复制 " + key, "ok");
+      }
+    }
+
+    function renderQr() {
+      const key = fields.qrTarget.value;
+      const value = currentLinks[key] || "";
+      qrText.value = value;
+      const ctx = qrCanvas.getContext("2d");
+      ctx.clearRect(0, 0, qrCanvas.width, qrCanvas.height);
+      if (!value) {
+        qrHint.textContent = "生成链接后显示二维码。";
+        return;
+      }
+      if (!window.QRCode) {
+        qrHint.textContent = "二维码库未加载，链接仍可复制。";
+        return;
+      }
+      QRCode.toCanvas(qrCanvas, value, {
+        width: 220,
+        margin: 1,
+        color: { dark: "#1c2430", light: "#ffffff" }
+      }, (error) => {
+        qrHint.textContent = error ? "二维码生成失败。" : key + " 二维码";
+      });
+    }
+
+    function normalizeUrl(value) {
+      const raw = String(value || "").trim();
+      if (!raw) throw new Error("缺少 URL");
+      const withProtocol = /^https?:\/\//i.test(raw) ? raw : "https://" + raw;
+      const url = new URL(withProtocol);
+      if (url.protocol !== "https:") throw new Error("URL 必须使用 https");
+      return url.href.replace(/\/+$/, "");
+    }
+
+    function normalizeWorkerOrigin(value) {
+      const raw = String(value || "").trim();
+      if (!raw) throw new Error("缺少 Worker Host");
+      if (/^https?:\/\//i.test(raw)) {
+        const url = new URL(raw);
+        if (url.protocol !== "https:") throw new Error("Worker Host 必须使用 https");
+        return url.origin;
+      }
+      const host = raw.replace(/^\/+/, "").split("/")[0];
+      return "https://" + host;
+    }
+
+    function setStatus(message, type) {
+      statusEl.textContent = message;
+      statusEl.className = "status" + (type ? " " + type : "");
+    }
+
+    function saveSafeState() {
+      localStorage.setItem("ip168-admin-url", fields.adminUrl.value.trim());
+      localStorage.setItem("ip168-converter-url", fields.converterUrl.value.trim());
+      localStorage.setItem("ip168-rules", fields.rules.value);
+    }
+
+    function restoreSaved() {
+      fields.adminUrl.value = localStorage.getItem("ip168-admin-url") || fields.adminUrl.value;
+      fields.converterUrl.value = localStorage.getItem("ip168-converter-url") || fields.converterUrl.value || DEFAULT_CONVERTER;
+      fields.rules.value = localStorage.getItem("ip168-rules") || fields.rules.value;
+    }
+
+    function clearSaved() {
+      localStorage.removeItem("ip168-admin-url");
+      localStorage.removeItem("ip168-converter-url");
+      localStorage.removeItem("ip168-rules");
+      fields.adminPassword.value = "";
+      fields.workerHost.value = "";
+      fields.subToken.value = "";
+      currentLinks = {};
+      renderLinks({});
+      renderQr();
+      setStatus("已清空", "");
+    }
+
+    function escapeAttr(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+  </script>
+</body>
+</html>
