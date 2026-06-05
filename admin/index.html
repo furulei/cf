@@ -8,19 +8,24 @@
   <!--IP168_BOOTSTRAP-->
   <style>
     :root {
-      color-scheme: light;
-      --bg: #f5f7fb;
-      --panel: #ffffff;
-      --panel-soft: #f9fbfd;
-      --line: #d8e0ea;
-      --text: #182235;
-      --muted: #64748b;
-      --brand: #116d62;
-      --brand-strong: #0b4f48;
-      --blue: #2457a6;
-      --red: #b42318;
-      --amber: #9a5b13;
-      --shadow: 0 10px 28px rgba(24, 34, 53, 0.08);
+      color-scheme: dark;
+      --bg: #202028;
+      --panel: rgba(255, 255, 255, 0.035);
+      --panel-soft: rgba(255, 255, 255, 0.055);
+      --line: rgba(255, 255, 255, 0.78);
+      --line-strong: rgba(255, 255, 255, 0.96);
+      --text: rgba(255, 255, 255, 0.92);
+      --muted: rgba(255, 255, 255, 0.62);
+      --brand: rgba(255, 255, 255, 0.92);
+      --brand-strong: rgba(255, 255, 255, 0.96);
+      --blue: rgba(255, 255, 255, 0.82);
+      --red: #ffd1d1;
+      --amber: #ffe1ad;
+      --control-bg: rgba(255, 255, 255, 0.018);
+      --control-bg-hover: rgba(255, 255, 255, 0.075);
+      --control-bg-active: rgba(255, 255, 255, 0.175);
+      --hairline: rgba(255, 255, 255, 0.34);
+      --shadow: 0 18px 42px rgba(0, 0, 0, 0.16);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     * {
@@ -29,20 +34,59 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: var(--bg);
+      position: relative;
+      overflow-x: hidden;
+      background:
+        linear-gradient(90deg, rgba(68, 45, 45, 0.92) 0%, rgba(43, 37, 41, 0.96) 42%, #202028 100%),
+        linear-gradient(180deg, #3b2d2d 0%, #222229 100%);
       color: var(--text);
     }
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      inset: -12%;
+      pointer-events: none;
+    }
+    body::before {
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      background-size: 66px 66px;
+      opacity: 0.38;
+      transform: rotate(-13deg) scale(1.35);
+      transform-origin: center;
+    }
+    body::after {
+      background:
+        linear-gradient(118deg, rgba(255, 255, 255, 0.08), transparent 24%, rgba(0, 0, 0, 0.18) 58%, transparent 88%),
+        repeating-linear-gradient(152deg, transparent 0 118px, rgba(255, 255, 255, 0.035) 119px, transparent 120px),
+        radial-gradient(circle at 50% 52%, transparent 0 30%, rgba(0, 0, 0, 0.34) 78%);
+      opacity: 0.74;
+    }
+    body.missing-entry {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      overflow: hidden;
+      color: rgba(255, 255, 255, 0.92);
+    }
     .shell {
-      width: min(1280px, calc(100vw - 28px));
+      width: min(1180px, calc(100vw - 28px));
       margin: 0 auto;
-      padding: 22px 0 36px;
+      padding: 24px 0 42px;
+      position: relative;
+      z-index: 1;
     }
     header {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 16px;
       margin-bottom: 16px;
+    }
+    .brand-block {
+      display: none;
     }
     h1 {
       margin: 0;
@@ -75,7 +119,7 @@
       padding: 4px 9px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: #fff;
+      background: var(--control-bg);
       max-width: 100%;
       overflow-wrap: anywhere;
     }
@@ -84,8 +128,8 @@
       max-width: 560px;
       padding: 10px 12px;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
+      border-radius: 4px;
+      background: var(--control-bg);
       color: var(--muted);
       font-size: 14px;
       line-height: 1.45;
@@ -93,29 +137,48 @@
     }
     .status.ok {
       color: var(--brand-strong);
-      border-color: rgba(17, 109, 98, 0.35);
+      border-color: var(--line);
     }
     .status.error {
       color: var(--red);
-      border-color: rgba(180, 35, 24, 0.35);
+      border-color: rgba(255, 209, 209, 0.45);
+    }
+    .header-tools {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: min(780px, 100%);
+      min-width: 0;
+    }
+    .header-tools .status {
+      flex: 1 1 360px;
+    }
+    #logoutButton {
+      width: auto;
+      min-width: 86px;
+      white-space: nowrap;
     }
     .tabs {
       display: flex;
       gap: 8px;
       overflow-x: auto;
-      padding-bottom: 8px;
-      margin-bottom: 12px;
+      padding: 12px 0 16px;
+      margin-bottom: 14px;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
     }
     .tab {
       width: auto;
       min-width: 92px;
       border-color: var(--line);
-      background: #fff;
+      background: var(--control-bg);
       color: var(--text);
     }
     .tab.active {
-      border-color: rgba(17, 109, 98, 0.45);
-      background: var(--brand);
+      border-color: var(--line-strong);
+      background: var(--control-bg-active);
       color: #fff;
     }
     .view {
@@ -130,12 +193,17 @@
       gap: 14px;
       align-items: start;
     }
+    .subscription-layout {
+      align-items: stretch;
+    }
     .panel {
       background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 4px;
       box-shadow: var(--shadow);
-      padding: 14px;
+      backdrop-filter: blur(2px) saturate(1.06);
+      -webkit-backdrop-filter: blur(2px) saturate(1.06);
+      padding: 20px;
       margin-bottom: 14px;
     }
     .panel.flat {
@@ -154,7 +222,7 @@
       gap: 6px;
       color: var(--text);
       font-size: 13px;
-      font-weight: 650;
+      font-weight: 520;
     }
     .check {
       display: inline-flex;
@@ -162,59 +230,121 @@
       gap: 8px;
       min-height: 38px;
       font-size: 14px;
-      font-weight: 650;
+      font-weight: 520;
     }
     .check input {
       width: 16px;
       height: 16px;
       margin: 0;
+      accent-color: rgba(255, 255, 255, 0.86);
     }
     input,
     select,
-    textarea,
     button {
-      width: 100%;
+      width: min(360px, 100%);
       border: 1px solid var(--line);
-      border-radius: 7px;
-      background: #fff;
+      border-radius: 4px;
+      background: var(--control-bg);
       color: var(--text);
       font: inherit;
       letter-spacing: 0;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.055),
+        0 16px 34px rgba(0, 0, 0, 0.12);
+      backdrop-filter: blur(2px) saturate(1.06);
+      -webkit-backdrop-filter: blur(2px) saturate(1.06);
+      transition:
+        background-color 0.2s ease-in-out,
+        border-color 0.2s ease-in-out,
+        box-shadow 0.2s ease-in-out,
+        color 0.2s ease-in-out,
+        transform 0.2s ease-in-out;
     }
     input,
     select {
-      min-height: 40px;
-      padding: 8px 10px;
+      min-height: 58px;
+      padding: 0 18px;
+      text-align: center;
+      justify-self: center;
+      font-weight: 400;
     }
     textarea {
-      min-height: 124px;
-      padding: 10px;
+      width: 100%;
+      min-height: 152px;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: var(--control-bg);
+      color: var(--text);
+      font: inherit;
+      font-weight: 400;
+      letter-spacing: 0;
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.055),
+        0 16px 34px rgba(0, 0, 0, 0.12);
+      backdrop-filter: blur(2px) saturate(1.06);
+      -webkit-backdrop-filter: blur(2px) saturate(1.06);
+      transition:
+        background-color 0.2s ease-in-out,
+        border-color 0.2s ease-in-out,
+        box-shadow 0.2s ease-in-out,
+        color 0.2s ease-in-out,
+        transform 0.2s ease-in-out;
       resize: vertical;
       line-height: 1.45;
     }
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--muted);
+      opacity: 1;
+    }
+    input:hover,
+    select:hover,
+    textarea:hover,
+    button:hover {
+      border-color: var(--line-strong);
+      background-color: var(--control-bg-hover);
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+        0 18px 42px rgba(0, 0, 0, 0.18);
+    }
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 0;
+      border-color: var(--line-strong);
+      background-color: var(--control-bg-active);
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, 0.24),
+        0 0 0 3px rgba(255, 255, 255, 0.1),
+        0 18px 42px rgba(0, 0, 0, 0.18);
+    }
+    select option {
+      color: #202028;
+      background: #f5f5f5;
+    }
     button {
-      min-height: 40px;
-      padding: 8px 12px;
-      border-color: var(--brand);
-      background: var(--brand);
-      color: #fff;
-      font-weight: 720;
-      cursor: pointer;
-    }
-    button.secondary {
-      border-color: var(--blue);
-      background: #fff;
-      color: var(--blue);
-    }
-    button.ghost {
+      min-height: 58px;
+      padding: 1px 6px;
       border-color: var(--line);
-      background: #fff;
+      background: var(--control-bg);
       color: var(--text);
+      font-weight: 520;
+      text-transform: none;
+      cursor: pointer;
+      justify-self: center;
     }
+    button:active {
+      background-color: var(--control-bg-active);
+      transform: translateY(0);
+    }
+    button.secondary,
+    button.ghost,
     button.warn {
-      border-color: rgba(154, 91, 19, 0.5);
-      background: #fff;
-      color: var(--amber);
+      border-color: var(--line);
+      background: var(--control-bg);
+      color: var(--text);
     }
     button:disabled {
       cursor: not-allowed;
@@ -225,11 +355,12 @@
       gap: 8px;
       flex-wrap: wrap;
       align-items: center;
+      justify-content: center;
       margin-top: 12px;
     }
     .actions button {
-      width: auto;
-      min-width: 118px;
+      width: min(360px, 100%);
+      min-width: 0;
     }
     .hint {
       color: var(--muted);
@@ -240,46 +371,76 @@
       font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
       overflow-wrap: anywhere;
     }
+    input.mono,
+    textarea.mono,
+    select.mono,
+    button.mono {
+      font-family: inherit;
+    }
     .link-list {
       display: grid;
       gap: 8px;
     }
     .link-row {
       display: grid;
-      grid-template-columns: 94px minmax(0, 1fr) auto auto;
+      grid-template-columns: minmax(90px, 1fr) auto auto;
       gap: 8px;
       align-items: center;
       padding: 8px;
       border: 1px solid var(--line);
-      border-radius: 7px;
+      border-radius: 4px;
       background: var(--panel-soft);
     }
     .link-row button {
-      min-width: 68px;
+      min-width: 96px;
       width: auto;
-      min-height: 34px;
-      padding: 6px 9px;
+      min-height: 58px;
+      padding: 1px 6px;
+    }
+    .compact-qr-panel {
+      align-self: stretch;
+      display: grid;
+      place-items: center;
+      position: relative;
+      min-height: 286px;
     }
     .qr-area {
       display: grid;
-      grid-template-columns: 230px minmax(0, 1fr);
-      gap: 12px;
-      align-items: start;
+      justify-items: center;
+      gap: 10px;
     }
     .qr-box {
       display: grid;
       place-items: center;
-      min-height: 230px;
+      width: 204px;
+      height: 204px;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
+      border-radius: 4px;
+      background: var(--panel-soft);
+    }
+    .qr-controls {
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: calc(50% + 112px);
+      pointer-events: none;
+    }
+    .qr-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 520;
+      color: var(--text);
     }
     .table-wrap {
       width: 100%;
       overflow-x: auto;
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
+      border-radius: 4px;
+      background: var(--panel-soft);
     }
     table {
       width: 100%;
@@ -295,8 +456,8 @@
       vertical-align: top;
     }
     th {
-      background: #eef3f8;
-      color: #43536a;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--muted);
       font-size: 12px;
       font-weight: 740;
     }
@@ -320,7 +481,7 @@
       min-height: 126px;
       padding: 10px;
       border: 1px solid var(--line);
-      border-radius: 7px;
+      border-radius: 4px;
       background: var(--panel-soft);
       color: var(--muted);
       font-size: 13px;
@@ -336,6 +497,54 @@
       border-radius: 8px;
       background: #fff;
       box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .direct-missing {
+      width: min(560px, calc(100vw - 48px));
+      max-width: none;
+      margin: 0;
+      padding: 28px 0;
+      position: relative;
+      z-index: 1;
+      border: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.78);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+      color: rgba(255, 255, 255, 0.92);
+      text-align: center;
+    }
+    .direct-missing::before,
+    .direct-missing::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: 28px;
+      pointer-events: none;
+      opacity: 0.86;
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.96)) left top / 64px 1px no-repeat,
+        linear-gradient(rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.96)) right top / 64px 1px no-repeat,
+        linear-gradient(rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.34)) left top / 1px 22px no-repeat,
+        linear-gradient(rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.34)) right top / 1px 22px no-repeat;
+    }
+    .direct-missing::before {
+      top: -1px;
+    }
+    .direct-missing::after {
+      bottom: -1px;
+      transform: rotate(180deg);
+    }
+    .direct-missing h1 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+      font-weight: 520;
+      letter-spacing: 0;
+      color: inherit;
+      text-shadow: 0 1px 18px rgba(0, 0, 0, 0.36);
     }
     @media (max-width: 960px) {
       .shell {
@@ -364,13 +573,20 @@
       .actions button {
         width: 100%;
       }
+      .header-tools {
+        justify-content: stretch;
+        min-width: 0;
+      }
+      #logoutButton {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <main id="app" class="shell">
     <header>
-      <div>
+      <div class="brand-block">
         <h1>IP168 控制台</h1>
         <div class="meta">
           <span id="originPill" class="pill mono">Worker</span>
@@ -378,7 +594,10 @@
           <span id="converterPill" class="pill mono">转换器</span>
         </div>
       </div>
-      <div id="status" class="status">正在连接 Worker 后台...</div>
+      <div class="header-tools">
+        <div id="status" class="status">正在连接 Worker 后台...</div>
+        <button id="logoutButton" class="ghost" type="button">登出</button>
+      </div>
     </header>
 
     <nav class="tabs" aria-label="控制台页面">
@@ -467,28 +686,19 @@
     </section>
 
     <section id="subView" class="view">
-      <div class="layout">
+      <div class="layout subscription-layout">
         <section class="panel">
           <h2>订阅链接</h2>
           <div id="links" class="link-list"></div>
-          <p class="hint">复制给客户端后，由客户端访问你自己的 Worker 订阅地址；Clash 和 Sing-box 格式由转换接口实时生成。</p>
         </section>
 
-        <section class="panel">
-          <h2>二维码</h2>
+        <section class="panel compact-qr-panel">
           <div class="qr-area">
             <div class="qr-box">
-              <canvas id="qrCanvas" width="220" height="220"></canvas>
+              <canvas id="qrCanvas" width="196" height="196"></canvas>
             </div>
-            <div>
-              <label>当前二维码内容
-                <textarea id="qrText" class="mono" readonly></textarea>
-              </label>
-              <div class="actions">
-                <button id="copyQrText" class="secondary" type="button">复制当前链接</button>
-                <button id="openSub" class="ghost" type="button">打开链接</button>
-              </div>
-              <p id="qrHint" class="hint">选择订阅格式后显示二维码。</p>
+            <div class="qr-controls">
+              <p id="qrHint" class="qr-title">选择订阅格式后显示二维码。</p>
             </div>
           </div>
         </section>
@@ -646,7 +856,9 @@
     const statusEl = document.getElementById("status");
 
     if (!injected) {
-      app.innerHTML = '<section class="direct-open"><h1>IP168 控制台</h1><p>请通过你自己的 Worker 后台入口打开本页。直接访问 GitHub 静态页面时，页面没有用户 Worker 的接口信息，不能读取或保存配置。</p></section>';
+      document.body.classList.add("missing-entry");
+      app.className = "direct-open direct-missing";
+      app.innerHTML = "<h1>无法找到入口</h1>";
       throw new Error("IP168 bootstrap is missing");
     }
 
@@ -824,9 +1036,8 @@
       };
       const links = document.getElementById("links");
       links.innerHTML = Object.entries(state.links).map(([name, value]) => `
-        <div class="link-row">
+        <div class="link-row" data-value="${escapeHtml(value)}">
           <strong>${escapeHtml(name)}</strong>
-          <span class="mono">${escapeHtml(value || "请先填写订阅 token")}</span>
           <button class="secondary" type="button" data-copy="${escapeHtml(name)}" ${value ? "" : "disabled"}>复制</button>
           <button class="ghost" type="button" data-qr="${escapeHtml(name)}" ${value ? "" : "disabled"}>二维码</button>
         </div>
@@ -845,9 +1056,7 @@
     function renderQr(value, label) {
       state.qrUrl = value || "";
       const canvas = document.getElementById("qrCanvas");
-      const text = document.getElementById("qrText");
       const hint = document.getElementById("qrHint");
-      text.value = state.qrUrl;
       const ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (!state.qrUrl) {
@@ -859,7 +1068,7 @@
         return;
       }
       window.QRCode.toCanvas(canvas, state.qrUrl, {
-        width: 220,
+        width: 196,
         margin: 1,
         errorCorrectionLevel: "M"
       }, (error) => {
@@ -1083,6 +1292,24 @@
       setStatus("自动维护运行完成。", "ok");
     }
 
+    function logoutEndpoint() {
+      const fallbackBase = bootstrap.apiBase || (bootstrap.adminBase + "/api");
+      return new URL(bootstrap.endpoints.logout || (fallbackBase + "/logout"), bootstrap.workerOrigin).href;
+    }
+
+    async function logout() {
+      setStatus("正在退出登录...");
+      const response = await fetch(logoutEndpoint(), {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store"
+      });
+      if (!response.ok) {
+        throw new Error("退出登录失败");
+      }
+      window.location.href = bootstrap.adminBase;
+    }
+
     function bindEvents() {
       document.querySelectorAll(".tab").forEach((button) => {
         button.addEventListener("click", () => {
@@ -1095,15 +1322,12 @@
       document.getElementById("saveConfig").addEventListener("click", () => saveAll().catch(showError));
       document.getElementById("saveAll").addEventListener("click", () => saveAll().catch(showError));
       document.getElementById("reloadState").addEventListener("click", () => loadState().catch(showError));
+      document.getElementById("logoutButton").addEventListener("click", () => logout().catch(showError));
       document.getElementById("refreshEntries").addEventListener("click", () => refreshEntries().catch(showError));
       document.getElementById("loadCandidates").addEventListener("click", () => loadCandidates().catch(showError));
       document.getElementById("probeSelected").addEventListener("click", () => probeSelected().catch(showError));
       document.getElementById("selectOk").addEventListener("click", selectOk);
       document.getElementById("saveSelected").addEventListener("click", () => saveSelectedProxyip().catch(showError));
-      document.getElementById("copyQrText").addEventListener("click", () => copyText(state.qrUrl));
-      document.getElementById("openSub").addEventListener("click", () => {
-        if (state.qrUrl) window.open(state.qrUrl, "_blank", "noopener,noreferrer");
-      });
       document.getElementById("saveAuto").addEventListener("click", () => saveAuto().catch(showError));
       document.getElementById("runAuto").addEventListener("click", () => runAuto(false).catch(showError));
       document.getElementById("forceReplace").addEventListener("click", () => runAuto(true).catch(showError));
