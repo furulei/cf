@@ -22,6 +22,8 @@ assert.match(html, /bootstrap\.endpoints\.proxyRun/);
 assert.match(html, /bootstrap\.catalog\.summaryUrl/);
 assert.match(html, /bootstrap\.catalog\.queryUrl/);
 assert.match(html, /bootstrap\.subPath/);
+assert.match(html, /168\.txt/);
+assert.doesNotMatch(html, /ADD\.txt/);
 assert.match(html, /https:\/\/furulei\.github\.io\/cf\/vendor\/qrcode\.min\.js/);
 assert.match(html, /DEFAULT_SUB_NAME\s*=\s*"\\u5f52\\u6765\\u662f\\u5c11\\u5e74"/);
 assert.doesNotMatch(html, /edgetunnel/);
