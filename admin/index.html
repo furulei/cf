@@ -439,7 +439,7 @@
 
         <section class="panel">
           <h2>入口和反代</h2>
-          <label>Cloudflare entry endpoints (ADD.txt)
+          <label>Cloudflare entry endpoints (168.txt)
             <textarea id="addText" class="mono" spellcheck="false"></textarea>
           </label>
           <div class="grid" style="margin-top:12px">
@@ -460,7 +460,7 @@
           </label>
           <div class="actions">
             <button id="saveAll" type="button">保存全部</button>
-            <button id="refreshEntries" class="ghost" type="button">刷新 ADD</button>
+            <button id="refreshEntries" class="ghost" type="button">刷新入口</button>
           </div>
         </section>
       </div>
@@ -906,7 +906,7 @@
       const data = await api(bootstrap.endpoints.entries);
       state.addText = data.addText || "";
       fields.addText.value = state.addText;
-      setStatus("ADD 已刷新。", "ok");
+      setStatus("入口已刷新。", "ok");
     }
 
     function renderCandidates() {
