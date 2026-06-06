@@ -143,6 +143,34 @@
       color: var(--red);
       border-color: rgba(255, 209, 209, 0.45);
     }
+    .subscription-panel {
+      --sub-button-width: 144px;
+      --sub-button-gap: 8px;
+      --sub-action-width: calc(var(--sub-button-width) * 2 + var(--sub-button-gap));
+    }
+    .subscription-title-row {
+      display: grid;
+      grid-template-columns: minmax(90px, 1fr) var(--sub-action-width);
+      gap: var(--sub-button-gap);
+      align-items: center;
+      padding: 0 8px;
+      margin-bottom: 14px;
+    }
+    .subscription-title-row h2 {
+      margin: 0;
+    }
+    .subscription-status {
+      width: var(--sub-action-width);
+      min-width: 0;
+      max-width: 100%;
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
     .header-tools {
       display: flex;
       align-items: flex-start;
@@ -193,8 +221,49 @@
       gap: 14px;
       align-items: start;
     }
+    .config-layout {
+      grid-template-columns: 1fr;
+    }
+    .basic-config-panel[hidden] {
+      display: none;
+    }
     .subscription-layout {
       align-items: stretch;
+    }
+    .proxy-panel {
+      display: grid;
+      gap: 14px;
+    }
+    .proxy-controls {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+    .proxy-controls label {
+      min-width: 0;
+    }
+    .proxy-controls :is(select, input, button) {
+      width: 100%;
+      min-height: 58px;
+      justify-self: stretch;
+    }
+    .proxy-editors {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+    .proxy-editors label {
+      align-content: start;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .proxy-editors textarea {
+      min-height: 330px;
+    }
+    .proxy-actions {
+      margin-top: 2px;
     }
     .panel {
       background: var(--panel);
@@ -383,8 +452,8 @@
     }
     .link-row {
       display: grid;
-      grid-template-columns: minmax(90px, 1fr) auto auto;
-      gap: 8px;
+      grid-template-columns: minmax(90px, 1fr) repeat(2, var(--sub-button-width));
+      gap: var(--sub-button-gap);
       align-items: center;
       padding: 8px;
       border: 1px solid var(--line);
@@ -392,8 +461,8 @@
       background: var(--panel-soft);
     }
     .link-row button {
-      min-width: 96px;
-      width: auto;
+      min-width: 0;
+      width: 100%;
       min-height: 58px;
       padding: 1px 6px;
     }
@@ -401,39 +470,61 @@
       align-self: stretch;
       display: grid;
       place-items: center;
-      position: relative;
-      min-height: 286px;
+      min-height: 428px;
     }
     .qr-area {
       display: grid;
       justify-items: center;
-      gap: 10px;
+      align-content: center;
+      gap: 14px;
+      width: 100%;
+    }
+    .qr-name-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 72px;
+      gap: 8px;
+      align-items: center;
+      width: min(320px, 100%);
+    }
+    .qr-sub-name-input {
+      width: 100%;
+      min-height: 46px;
+      margin: 0;
+      padding: 0 8px;
+      border: 0;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.055);
+      box-shadow: none;
+      font-size: 28px;
+      line-height: 1.2;
+      font-weight: 740;
+      color: var(--text);
+      text-align: center;
+    }
+    .qr-sub-name-input:hover,
+    .qr-sub-name-input:focus {
+      border: 1px solid var(--line);
+      background: var(--control-bg);
+      transform: translateY(-1px);
+    }
+    .qr-save-name {
+      width: 100%;
+      min-width: 0;
+      min-height: 46px;
+      padding: 1px 6px;
     }
     .qr-box {
       display: grid;
       place-items: center;
-      width: 204px;
-      height: 204px;
+      width: min(320px, 100%);
+      aspect-ratio: 1;
       border: 1px solid var(--line);
       border-radius: 4px;
       background: var(--panel-soft);
     }
-    .qr-controls {
-      display: grid;
-      justify-items: center;
-      gap: 8px;
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: calc(50% + 112px);
-      pointer-events: none;
-    }
-    .qr-title {
-      margin: 0;
-      font-size: 18px;
-      line-height: 1.2;
-      font-weight: 520;
-      color: var(--text);
+    .qr-box canvas {
+      width: 100%;
+      height: 100%;
     }
     .table-wrap {
       width: 100%;
@@ -464,6 +555,119 @@
     tr:last-child td {
       border-bottom: 0;
     }
+    .proxyip-picker-panel {
+      display: grid;
+      gap: 14px;
+    }
+    .proxyip-country-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      min-height: 126px;
+      align-content: start;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.1);
+    }
+    .proxyip-country {
+      width: 100%;
+      min-height: 58px;
+      justify-self: stretch;
+    }
+    .proxyip-country.active,
+    .proxyip-tab.active {
+      border-color: var(--line-strong);
+      background: var(--control-bg-active);
+      color: #fff;
+    }
+    .proxyip-main {
+      display: grid;
+      gap: 0;
+    }
+    .proxyip-tabs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      width: min(390px, 100%);
+      justify-self: end;
+      margin-bottom: -1px;
+      position: relative;
+      z-index: 1;
+    }
+    .proxyip-tab {
+      width: 100%;
+      min-height: 58px;
+      justify-self: stretch;
+    }
+    .proxyip-table-wrap table {
+      min-width: 100%;
+      table-layout: fixed;
+    }
+    .proxyip-table-wrap th:nth-child(1),
+    .proxyip-table-wrap td:nth-child(1) {
+      width: 46px;
+      text-align: center;
+    }
+    .proxyip-table-wrap th:nth-child(2),
+    .proxyip-table-wrap td:nth-child(2) {
+      width: 42%;
+    }
+    .proxyip-table-wrap th:nth-child(3),
+    .proxyip-table-wrap td:nth-child(3) {
+      width: 16%;
+      text-align: center;
+    }
+    .proxyip-table-wrap th:nth-child(4),
+    .proxyip-table-wrap td:nth-child(4) {
+      width: 24%;
+      text-align: center;
+    }
+    .proxyip-table-wrap th:nth-child(5),
+    .proxyip-table-wrap td:nth-child(5) {
+      width: 14%;
+      text-align: center;
+    }
+    .proxyip-table-wrap input[type="checkbox"] {
+      width: 16px;
+      min-height: 16px;
+      height: 16px;
+      margin: 0;
+      justify-self: center;
+      box-shadow: none;
+      accent-color: rgba(255, 255, 255, 0.86);
+    }
+    .proxyip-footer {
+      display: grid;
+      gap: 10px;
+    }
+    .proxyip-selected-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .proxyip-selected-row input {
+      width: 100%;
+      min-height: 42px;
+      text-align: left;
+      justify-self: stretch;
+    }
+    .proxyip-actions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .proxyip-actions button {
+      width: 100%;
+      min-height: 58px;
+      justify-self: stretch;
+    }
+    .proxyip-hidden-settings[hidden] {
+      display: none;
+    }
     .ok {
       color: var(--brand-strong);
       font-weight: 740;
@@ -488,6 +692,43 @@
       line-height: 1.5;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
+    }
+    .auto-main-panel {
+      min-height: 0;
+      display: grid;
+      align-content: start;
+      gap: 14px;
+    }
+    .auto-status-layout {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .auto-status-layout h2,
+    .auto-status-layout h3 {
+      margin-bottom: 10px;
+    }
+    .auto-status-layout #currentProxyip {
+      min-height: 88px;
+    }
+    .auto-visible-settings {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      align-items: end;
+      margin-top: 0;
+    }
+    .auto-visible-settings label {
+      min-width: 0;
+    }
+    .auto-visible-settings :is(select, button) {
+      width: 100%;
+      min-height: 58px;
+      justify-self: stretch;
+    }
+    .auto-actions {
+      display: none;
+    }
+    .auto-hidden-settings[hidden] {
+      display: none;
     }
     .direct-open {
       max-width: 760px;
@@ -554,7 +795,9 @@
       header,
       .layout,
       .split,
-      .qr-area {
+      .qr-area,
+      .proxy-controls,
+      .proxy-editors {
         grid-template-columns: 1fr;
       }
       header {
@@ -565,7 +808,7 @@
         grid-template-columns: 1fr;
       }
       .link-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(90px, 1fr) repeat(2, var(--sub-button-width));
       }
       .link-row button {
         width: 100%;
@@ -578,6 +821,15 @@
         min-width: 0;
       }
       #logoutButton {
+        width: 100%;
+      }
+    }
+    @media (max-width: 430px) {
+      .subscription-title-row,
+      .link-row {
+        grid-template-columns: 1fr;
+      }
+      .subscription-status {
         width: 100%;
       }
     }
@@ -595,7 +847,6 @@
         </div>
       </div>
       <div class="header-tools">
-        <div id="status" class="status">正在连接 Worker 后台...</div>
         <button id="logoutButton" class="ghost" type="button">登出</button>
       </div>
     </header>
@@ -608,8 +859,8 @@
     </nav>
 
     <section id="configView" class="view active">
-      <div class="layout">
-        <section class="panel">
+      <div class="layout config-layout">
+        <section class="panel basic-config-panel" hidden>
           <h2>基础配置</h2>
           <div class="grid">
             <label>Worker Host
@@ -634,9 +885,6 @@
             <label>订阅 token
               <input id="token" class="mono" spellcheck="false" autocomplete="off">
             </label>
-            <label>订阅名称
-              <input id="subName" spellcheck="false" autocomplete="off">
-            </label>
           </div>
           <label class="check" style="margin-top:12px">
             <input id="echEnabled" type="checkbox">
@@ -656,28 +904,25 @@
           </div>
         </section>
 
-        <section class="panel">
-          <h2>入口和反代</h2>
-          <label>Cloudflare entry endpoints (168.txt)
-            <textarea id="addText" class="mono" spellcheck="false"></textarea>
-          </label>
-          <div class="grid" style="margin-top:12px">
-            <label>Proxy mode
-              <select id="proxyMode">
-                <option value="proxy-only">Proxy only</option>
-                <option value="direct-only">Direct only</option>
-                <option value="proxy-first">Proxy first</option>
-                <option value="direct-first">Direct first</option>
-              </select>
+        <section class="panel proxy-panel">
+          <div class="proxy-editors">
+            <label>入口IP
+              <textarea id="addText" class="mono" spellcheck="false"></textarea>
             </label>
-            <label>当前 PROXYIP 数量
-              <input id="proxyCount" readonly>
+            <label>落地IP
+              <textarea id="proxyip" class="mono" spellcheck="false"></textarea>
             </label>
           </div>
-          <label style="margin-top:12px">Landing relay endpoints (PROXYIP)
-            <textarea id="proxyip" class="mono" spellcheck="false"></textarea>
-          </label>
-          <div class="actions">
+          <div class="proxy-controls proxy-actions">
+            <label>模式
+              <select id="proxyMode">
+                <option value="auto">自动</option>
+                <option value="manual">手动</option>
+              </select>
+            </label>
+            <label>数量
+              <input id="proxyCount" readonly>
+            </label>
             <button id="saveAll" type="button">保存全部</button>
             <button id="refreshEntries" class="ghost" type="button">刷新入口</button>
           </div>
@@ -687,18 +932,22 @@
 
     <section id="subView" class="view">
       <div class="layout subscription-layout">
-        <section class="panel">
-          <h2>订阅链接</h2>
+        <section class="panel subscription-panel">
+          <div class="subscription-title-row">
+            <h2>订阅链接</h2>
+            <div id="status" class="status subscription-status"></div>
+          </div>
           <div id="links" class="link-list"></div>
         </section>
 
         <section class="panel compact-qr-panel">
           <div class="qr-area">
-            <div class="qr-box">
-              <canvas id="qrCanvas" width="196" height="196"></canvas>
+            <div class="qr-name-row">
+              <input id="subName" class="qr-sub-name-input" spellcheck="false" autocomplete="off" aria-label="订阅名称">
+              <button id="saveSubName" class="qr-save-name secondary" type="button">保存</button>
             </div>
-            <div class="qr-controls">
-              <p id="qrHint" class="qr-title">选择订阅格式后显示二维码。</p>
+            <div class="qr-box">
+              <canvas id="qrCanvas" width="320" height="320"></canvas>
             </div>
           </div>
         </section>
@@ -706,78 +955,103 @@
     </section>
 
     <section id="proxyView" class="view">
-      <section class="panel flat">
-        <h2>中央库小批量拉取</h2>
-        <div class="grid three">
-          <label>国家
-            <select id="countrySelect"><option value="">加载中</option></select>
-          </label>
-          <label>端口
-            <select id="portSelect"><option value="">全部</option></select>
-          </label>
-          <label>状态
-            <select id="statusSelect">
-              <option value="verified,usable">verified + usable</option>
-              <option value="verified">verified</option>
-              <option value="usable">usable</option>
-              <option value="all">全部</option>
-            </select>
-          </label>
-          <label>拉取数量
-            <input id="limitInput" type="number" min="1" max="100" value="50">
-          </label>
-          <label>测速超时(ms)
-            <input id="timeoutMs" type="number" min="1000" max="8000" value="3500">
-          </label>
-          <label>并发
-            <input id="concurrency" type="number" min="1" max="8" value="4">
-          </label>
+      <section class="panel flat proxyip-picker-panel">
+        <div class="proxyip-country-grid" id="proxyCountryButtons">
+          <button class="proxyip-country active" type="button" data-country="">全部</button>
         </div>
-        <div class="actions">
-          <button id="loadCandidates" type="button">拉取候选</button>
-          <button id="probeSelected" class="secondary" type="button" disabled>测试选中</button>
-          <button id="selectOk" class="ghost" type="button" disabled>只保留可用</button>
-          <button id="saveSelected" class="warn" type="button" disabled>写入 PROXYIP</button>
-        </div>
-        <p id="candidateStatus" class="hint">中央库每次最多拉取 100 条，测速走当前用户自己的 Worker。</p>
-      </section>
-
-      <section class="panel">
-        <div class="actions" style="margin-top:0;margin-bottom:10px">
-          <label class="check">
-            <input id="toggleAll" type="checkbox">
-            全选当前候选
-          </label>
-        </div>
-        <div class="table-wrap">
+        <div class="proxyip-main">
+          <div class="proxyip-tabs">
+            <button class="proxyip-tab active" type="button" data-ip-version="4">IPv4</button>
+            <button class="proxyip-tab" type="button" data-ip-version="6">IPv6</button>
+          </div>
+          <div class="table-wrap proxyip-table-wrap">
+            <div class="proxyip-hidden-settings" hidden>
+              <select id="countrySelect"><option value="">全部国家</option></select>
+              <select id="portSelect"><option value="443">443</option></select>
+              <select id="statusSelect">
+                <option value="verified,usable">已验证 + 可用</option>
+                <option value="verified">已验证</option>
+                <option value="usable">可用</option>
+                <option value="all">全部</option>
+              </select>
+              <input id="limitInput" type="number" min="1" max="100" value="50">
+              <input id="timeoutMs" type="number" min="1000" max="8000" value="3500">
+              <input id="concurrency" type="number" min="1" max="8" value="4">
+              <input id="toggleAll" type="checkbox">
+              <button id="selectOk" type="button" disabled>只保留可用</button>
+            </div>
           <table>
             <thead>
               <tr>
                 <th style="width:46px">选</th>
-                <th>ProxyIP</th>
-                <th>国家</th>
-                <th>位置/ASN</th>
-                <th>库延迟</th>
-                <th>当前测速</th>
-                <th>落地</th>
+                <th>IP地址:端口</th>
+                <th>出口</th>
+                <th>地区</th>
+                <th>延迟</th>
               </tr>
             </thead>
             <tbody id="tbody">
-              <tr><td colspan="7" class="hint">暂无候选。</td></tr>
+              <tr><td colspan="5" class="hint">暂无候选。</td></tr>
             </tbody>
           </table>
+          </div>
+        </div>
+        <div class="proxyip-footer">
+          <div class="proxyip-selected-row">
+            <span id="candidateStatus" class="hint">已选 0/0</span>
+            <input id="customProxyip" class="mono" placeholder="自定义地址，多个用逗号分隔" spellcheck="false">
+          </div>
+          <div class="proxyip-actions">
+            <button id="saveSelected" class="warn" type="button" disabled>确认</button>
+            <button id="cancelProxyip" class="ghost" type="button">取消</button>
+            <button id="probeSelected" class="secondary" type="button" disabled>测速</button>
+            <button id="loadCandidates" type="button">自动</button>
+          </div>
         </div>
       </section>
     </section>
 
     <section id="autoView" class="view">
       <div class="split">
-        <section class="panel">
-          <h2>自动维护设置</h2>
-          <div class="grid">
+        <section class="panel auto-main-panel">
+          <div class="grid auto-status-layout">
+            <div>
+              <h2>维护状态</h2>
+              <div id="autoState" class="state-box">未读取。</div>
+            </div>
+            <div>
+              <h3>当前落地</h3>
+              <div id="currentProxyip" class="state-box mono"></div>
+            </div>
+          </div>
+          <div class="grid auto-visible-settings">
+            <label>国家
+              <select id="autoCountry">
+                <option value="US">美国</option>
+              </select>
+            </label>
+            <label>端口
+              <select id="autoPort">
+                <option value="443">443</option>
+              </select>
+            </label>
+            <button id="runAuto" class="secondary" type="button">立即运行</button>
+          </div>
+          <div class="auto-hidden-settings" hidden>
             <label class="check">
               <input id="autoEnabled" type="checkbox">
-              启用定时自动维护
+              启用自动维护
+            </label>
+            <label>状态
+              <select id="autoStatus">
+                <option value="verified,usable">已验证 + 可用</option>
+                <option value="verified">已验证</option>
+                <option value="usable">可用</option>
+                <option value="all">全部</option>
+              </select>
+            </label>
+            <label>写入数量
+              <input id="autoSaveCount" type="number" min="1" max="10">
             </label>
             <label class="check">
               <input id="keepCurrentIfHealthy" type="checkbox">
@@ -791,27 +1065,8 @@
               <input id="autoHealOnAllFailed" type="checkbox">
               全失败时自愈
             </label>
-          </div>
-          <div class="grid three" style="margin-top:12px">
-            <label>国家
-              <input id="autoCountry" maxlength="2" spellcheck="false">
-            </label>
-            <label>端口
-              <input id="autoPort" inputmode="numeric" spellcheck="false">
-            </label>
-            <label>状态
-              <select id="autoStatus">
-                <option value="verified,usable">verified + usable</option>
-                <option value="verified">verified</option>
-                <option value="usable">usable</option>
-                <option value="all">全部</option>
-              </select>
-            </label>
             <label>候选数量
               <input id="autoCandidateLimit" type="number" min="1" max="50">
-            </label>
-            <label>写入数量
-              <input id="autoSaveCount" type="number" min="1" max="10">
             </label>
             <label>失败阈值
               <input id="failureThreshold" type="number" min="1" max="10">
@@ -832,18 +1087,10 @@
               <input id="standbyGroupSize" type="number" min="1" max="5">
             </label>
           </div>
-          <div class="actions">
-            <button id="saveAuto" type="button">保存自动维护</button>
-            <button id="runAuto" class="secondary" type="button">立即运行</button>
-            <button id="forceReplace" class="warn" type="button">强制换一组</button>
+          <div class="actions auto-actions">
+            <button id="saveAuto" type="button" hidden>保存自动维护</button>
+            <button id="forceReplace" class="warn" type="button" hidden>强制换一组</button>
           </div>
-        </section>
-
-        <section class="panel">
-          <h2>自动维护状态</h2>
-          <div id="autoState" class="state-box">未读取。</div>
-          <h3 style="margin-top:14px">当前 PROXYIP</h3>
-          <div id="currentProxyip" class="state-box mono"></div>
         </section>
       </div>
     </section>
@@ -874,6 +1121,7 @@
       nodes: [],
       selected: new Set(),
       probe: new Map(),
+      proxyIpVersion: "4",
       links: {},
       qrUrl: ""
     };
@@ -908,9 +1156,20 @@
       standbyGroupSize: document.getElementById("standbyGroupSize")
     };
 
+    const AUTO_COUNTRY_LABELS = {
+      DE: "德国",
+      NL: "荷兰",
+      GB: "英国",
+      US: "美国",
+      FI: "芬兰",
+      FR: "法国",
+      SG: "新加坡",
+      RU: "俄罗斯"
+    };
+
     function setStatus(text, type) {
       statusEl.textContent = text || "";
-      statusEl.className = "status" + (type ? " " + type : "");
+      statusEl.className = "status subscription-status" + (type ? " " + type : "");
     }
 
     function escapeHtml(value) {
@@ -927,8 +1186,16 @@
       return JSON.parse(JSON.stringify(value || {}));
     }
 
+    function cleanProxyipText(text) {
+      return String(text || "")
+        .split(/[\r\n,;]+/)
+        .map((item) => item.split("#")[0].trim())
+        .filter(Boolean)
+        .join(",");
+    }
+
     function countList(text) {
-      return String(text || "").split(/[\s,]+/).map((item) => item.trim()).filter(Boolean).length;
+      return cleanProxyipText(text).split(",").filter(Boolean).length;
     }
 
     function endpointOf(node) {
@@ -990,7 +1257,7 @@
       fields.echDns.value = ech.DNS || "";
       fields.echSni.value = ech.SNI || "";
       fields.addText.value = addText || "";
-      fields.proxyMode.value = proxy.Mode || "proxy-only";
+      fields.proxyMode.value = fields.autoEnabled?.checked ? "auto" : "manual";
       fields.proxyip.value = proxy.PROXYIP || "";
       fields.proxyCount.value = countList(proxy.PROXYIP || "");
       renderLinks();
@@ -1010,8 +1277,14 @@
         DNS: fields.echDns.value.trim(),
         SNI: fields.echSni.value.trim()
       };
-      proxy.Mode = fields.proxyMode.value;
-      proxy.PROXYIP = fields.proxyip.value.trim();
+      proxy.Mode = "proxy-only";
+      if (fields.proxyMode.value === "manual") {
+        proxy.PROXYIP = cleanProxyipText(fields.proxyip.value);
+        fields.proxyip.value = proxy.PROXYIP;
+      } else {
+        fields.proxyip.value = proxy.PROXYIP || "";
+      }
+      fields.proxyCount.value = countList(proxy.PROXYIP);
       sub.TOKEN = fields.token.value.trim();
       sub.SUBNAME = fields.subName.value.trim() || DEFAULT_SUB_NAME;
       config[PROXY_KEY] = proxy;
@@ -1043,7 +1316,7 @@
         </div>
       `).join("");
       links.querySelectorAll("[data-copy]").forEach((button) => {
-        button.addEventListener("click", () => copyText(state.links[button.dataset.copy]));
+        button.addEventListener("click", () => copyText(state.links[button.dataset.copy], button.dataset.copy));
       });
       links.querySelectorAll("[data-qr]").forEach((button) => {
         button.addEventListener("click", () => renderQr(state.links[button.dataset.qr], button.dataset.qr));
@@ -1056,58 +1329,98 @@
     function renderQr(value, label) {
       state.qrUrl = value || "";
       const canvas = document.getElementById("qrCanvas");
-      const hint = document.getElementById("qrHint");
       const ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (!state.qrUrl) {
-        hint.textContent = "没有可生成二维码的订阅链接。";
+        setStatus("没有可生成二维码的订阅链接。", "error");
         return;
       }
       if (!window.QRCode) {
-        hint.textContent = "二维码库未加载，链接仍可复制。";
+        setStatus("二维码库未加载，链接仍可复制。", "error");
         return;
       }
       window.QRCode.toCanvas(canvas, state.qrUrl, {
-        width: 196,
+        width: 320,
         margin: 1,
         errorCorrectionLevel: "M"
       }, (error) => {
-        hint.textContent = error ? "二维码生成失败。" : label + " 二维码";
+        setStatus(error ? "二维码生成失败。" : label + " 二维码", error ? "error" : "ok");
       });
     }
 
-    async function copyText(value) {
-      if (!value) return;
+    function copyTextWithSelection(value) {
+      const textarea = document.createElement("textarea");
+      textarea.value = value;
+      textarea.setAttribute("readonly", "");
+      textarea.style.position = "fixed";
+      textarea.style.left = "-9999px";
+      document.body.appendChild(textarea);
+      textarea.select();
+      let copied = false;
       try {
-        await navigator.clipboard.writeText(value);
-        setStatus("已复制。", "ok");
+        copied = document.execCommand("copy");
       } catch {
-        window.prompt("复制链接", value);
+        copied = false;
+      }
+      textarea.remove();
+      return copied;
+    }
+
+    function writeClipboardText(value) {
+      if (!navigator.clipboard?.writeText) {
+        return Promise.reject(new Error("Clipboard API unavailable"));
+      }
+      return Promise.race([
+        navigator.clipboard.writeText(value),
+        new Promise((_, reject) => window.setTimeout(() => reject(new Error("Clipboard write timeout")), 600))
+      ]);
+    }
+
+    async function copyText(value, label) {
+      if (!value) return;
+      const copiedLabel = label || "链接";
+      setStatus("已复制 " + copiedLabel, "ok");
+      if (copyTextWithSelection(value)) {
+        return;
+      }
+      try {
+        await writeClipboardText(value);
+      } catch {
       }
     }
 
     async function loadState() {
-      setStatus("正在读取配置...");
       const data = await api(bootstrap.endpoints.state);
       state.config = data.config || {};
       state.addText = data.addText || "";
+      state.currentProxyip = data.currentProxyip || state.config?.[PROXY_KEY]?.PROXYIP || "";
       state.auto = data.proxyAuto || { settings: {}, state: {} };
       fillForm(state.config, state.addText);
       fillAutoForm(state.auto.settings || {});
-      renderAutoState(state.auto.state || {}, "");
-      setStatus("配置已读取。", "ok");
+      renderAutoState(state.auto.state || {}, state.currentProxyip);
     }
 
     async function saveAll() {
       setStatus("正在保存配置...");
       const config = readConfigFromForm();
-      const data = await postJson(bootstrap.endpoints.save, {
-        config,
-        addText: fields.addText.value
-      });
+      const autoSettings = readAutoSettings();
+      const [data, autoData] = await Promise.all([
+        postJson(bootstrap.endpoints.save, {
+          config,
+          addText: fields.addText.value
+        }),
+        postJson(bootstrap.endpoints.proxyAuto, autoSettings)
+      ]);
       state.config = data.config || config;
       state.addText = data.addText || fields.addText.value;
+      state.currentProxyip = state.config?.[PROXY_KEY]?.PROXYIP || state.currentProxyip || "";
+      state.auto = {
+        settings: autoData.settings || autoSettings,
+        state: autoData.state || state.auto?.state || {}
+      };
       fillForm(state.config, state.addText);
+      fillAutoForm(state.auto.settings);
+      renderAutoState(state.auto.state, state.currentProxyip);
       setStatus("配置已保存。", "ok");
     }
 
@@ -1118,41 +1431,82 @@
       setStatus("入口已刷新。", "ok");
     }
 
+    function proxyHostOf(node) {
+      const directIp = String(node?.ip || "").trim();
+      if (directIp) return directIp;
+      const endpoint = endpointOf(node);
+      if (endpoint.startsWith("[")) {
+        const end = endpoint.indexOf("]");
+        return end > 0 ? endpoint.slice(1, end) : endpoint;
+      }
+      return endpoint.split(":")[0] || "";
+    }
+
+    function isNodeIpVersion(node, version) {
+      const host = proxyHostOf(node);
+      return String(version) === "6" ? host.includes(":") : host.includes(".") && !host.includes(":");
+    }
+
+    function filteredProxyNodes() {
+      return state.nodes.filter((node) => isNodeIpVersion(node, state.proxyIpVersion));
+    }
+
+    function proxyExitLabel(node, probe) {
+      if (probe && !probe.ok) return "失败";
+      const entryIp = proxyHostOf(node).toLowerCase();
+      const exitIp = String(probe?.exitIp || node.exitIp || "").trim().toLowerCase();
+      if (!entryIp || !exitIp) return "-";
+      return entryIp === exitIp ? "一致" : "不一致";
+    }
+
+    function proxyLatencyLabel(node, probe) {
+      if (probe && !probe.ok) return probe.error || "失败";
+      if (probe && probe.ok) return (probe.traceMs ?? probe.connectMs ?? "-") + "ms";
+      return node.latencyMs == null ? "-" : node.latencyMs + "ms";
+    }
+
+    function proxyRegionLabel(node, probe) {
+      const country = autoCountryLabel(probe?.loc || node.country || "");
+      const region = String(node.region || "").trim();
+      const city = String(node.city || "").trim();
+      return city || region || country || "-";
+    }
+
+    function selectedVisibleProxyCount(nodes) {
+      return nodes.filter((node) => state.selected.has(endpointOf(node))).length;
+    }
+
     function renderCandidates() {
       const tbody = document.getElementById("tbody");
-      if (!state.nodes.length) {
-        tbody.innerHTML = '<tr><td colspan="7" class="hint">暂无候选。</td></tr>';
+      const nodes = filteredProxyNodes();
+      if (!nodes.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="hint">暂无候选。</td></tr>';
         document.getElementById("probeSelected").disabled = true;
         document.getElementById("selectOk").disabled = true;
         document.getElementById("saveSelected").disabled = true;
+        document.getElementById("candidateStatus").textContent = "已选 0/0";
         return;
       }
-      tbody.innerHTML = state.nodes.map((node) => {
+      tbody.innerHTML = nodes.map((node) => {
         const proxy = endpointOf(node);
         const probe = state.probe.get(proxy);
-        const place = [node.region, node.city, node.org, node.asn].filter(Boolean).join(" / ") || "-";
-        const latency = node.latencyMs == null ? "-" : node.latencyMs + "ms";
-        const probeText = probe
-          ? probe.ok
-            ? '<span class="ok">' + escapeHtml((probe.connectMs ?? "-") + "ms / " + (probe.traceMs ?? "-") + "ms") + '</span>'
-            : '<span class="bad">' + escapeHtml(probe.error || "失败") + '</span>'
-          : "-";
-        const landing = probe && probe.ok ? [probe.exitIp, probe.loc, probe.colo].filter(Boolean).join(" / ") : "-";
         const checked = state.selected.has(proxy) ? "checked" : "";
+        const exitLabel = proxyExitLabel(node, probe);
+        const exitClass = exitLabel === "一致" ? "ok" : exitLabel === "不一致" || exitLabel === "失败" ? "bad" : "";
         return `<tr>
           <td><input data-pick="${escapeHtml(proxy)}" type="checkbox" ${checked}></td>
           <td class="mono">${escapeHtml(proxy)}</td>
-          <td>${escapeHtml(node.country || "-")}</td>
-          <td>${escapeHtml(place)}</td>
-          <td>${escapeHtml(latency)}</td>
-          <td>${probeText}</td>
-          <td class="mono">${escapeHtml(landing)}</td>
+          <td class="${exitClass}">${escapeHtml(exitLabel)}</td>
+          <td>${escapeHtml(proxyRegionLabel(node, probe))}</td>
+          <td>${escapeHtml(proxyLatencyLabel(node, probe))}</td>
         </tr>`;
       }).join("");
-      document.getElementById("probeSelected").disabled = !state.selected.size;
+      const visibleSelectedCount = selectedVisibleProxyCount(nodes);
+      document.getElementById("probeSelected").disabled = !visibleSelectedCount;
       document.getElementById("selectOk").disabled = !Array.from(state.probe.values()).some((item) => item.ok);
-      document.getElementById("saveSelected").disabled = !state.selected.size;
-      document.getElementById("toggleAll").checked = state.nodes.length > 0 && state.nodes.every((node) => state.selected.has(endpointOf(node)));
+      document.getElementById("saveSelected").disabled = !visibleSelectedCount && !document.getElementById("customProxyip").value.trim();
+      document.getElementById("toggleAll").checked = nodes.length > 0 && nodes.every((node) => state.selected.has(endpointOf(node)));
+      document.getElementById("candidateStatus").textContent = "已选 " + visibleSelectedCount + "/" + nodes.length;
     }
 
     async function loadSummary() {
@@ -1162,12 +1516,101 @@
       const countries = Array.isArray(data.countries) ? data.countries : [];
       const ports = Array.isArray(data.ports) ? data.ports : [];
       countrySelect.innerHTML = '<option value="">全部国家</option>' + countries.map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.code + " (" + item.count + ")")}</option>`).join("");
-      portSelect.innerHTML = '<option value="">全部端口</option>' + ports.map((item) => `<option value="${escapeHtml(item.port)}">${escapeHtml(item.port + " (" + item.count + ")")}</option>`).join("");
-      document.getElementById("candidateStatus").textContent = "中央库总量 " + (data.total || 0) + " 条；页面只按条件小批量拉取。";
+      const topPorts = topCatalogPorts(ports);
+      portSelect.innerHTML = topPorts.map((item) => `<option value="${escapeHtml(item.port)}">${escapeHtml(item.port)}</option>`).join("");
+      portSelect.value = topPorts.some((item) => item.port === "443") ? "443" : topPorts[0]?.port || "443";
+      renderProxyCountryButtons(countries);
+      fillAutoCountryOptions(countries);
+      fillAutoPortOptions(ports);
+      document.getElementById("candidateStatus").textContent = "已选 0/0";
+    }
+
+    function topCatalogPorts(ports) {
+      return (Array.isArray(ports) ? ports : [])
+        .map((item) => ({
+          port: String(item.port || "").trim(),
+          count: Number(item.count) || 0
+        }))
+        .filter((item) => item.port)
+        .sort((left, right) => (Number(right.count) || 0) - (Number(left.count) || 0))
+        .slice(0, 3);
+    }
+
+    function autoCountryLabel(code) {
+      const normalized = String(code || "").trim().toUpperCase();
+      return AUTO_COUNTRY_LABELS[normalized] || normalized;
+    }
+
+    function renderProxyCountryButtons(countries) {
+      const topCountries = (Array.isArray(countries) ? countries : [])
+        .map((item) => ({
+          code: String(item.code || "").trim().toUpperCase(),
+          count: Number(item.count) || 0
+        }))
+        .filter((item) => item.code)
+        .sort((left, right) => (Number(right.count) || 0) - (Number(left.count) || 0))
+        .slice(0, 5);
+      const current = document.getElementById("countrySelect").value;
+      const buttons = [{ code: "", label: "全部" }].concat(topCountries.map((item) => ({ code: item.code, label: autoCountryLabel(item.code) })));
+      document.getElementById("proxyCountryButtons").innerHTML = buttons.map((item) => {
+        const active = item.code === current ? " active" : "";
+        return `<button class="proxyip-country${active}" type="button" data-country="${escapeHtml(item.code)}">${escapeHtml(item.label)}</button>`;
+      }).join("");
+    }
+
+    function setProxyCountry(country) {
+      document.getElementById("countrySelect").value = country;
+      document.querySelectorAll(".proxyip-country").forEach((button) => {
+        button.classList.toggle("active", button.dataset.country === country);
+      });
+      state.nodes = [];
+      state.probe.clear();
+      state.selected.clear();
+      renderCandidates();
+    }
+
+    function setProxyIpVersion(version) {
+      state.proxyIpVersion = String(version) === "6" ? "6" : "4";
+      document.querySelectorAll(".proxyip-tab").forEach((button) => {
+        button.classList.toggle("active", button.dataset.ipVersion === state.proxyIpVersion);
+      });
+      state.selected = new Set(filteredProxyNodes().map(endpointOf).filter(Boolean));
+      renderCandidates();
+    }
+
+    function resetProxyPicker() {
+      state.selected.clear();
+      document.getElementById("customProxyip").value = "";
+      renderCandidates();
+    }
+
+    function fillAutoCountryOptions(countries) {
+      const topCountries = (Array.isArray(countries) ? countries : [])
+        .map((item) => ({
+          code: String(item.code || "").trim().toUpperCase(),
+          count: Number(item.count) || 0
+        }))
+        .filter((item) => item.code)
+        .sort((left, right) => (Number(right.count) || 0) - (Number(left.count) || 0))
+        .slice(0, 5);
+      const current = String(state.auto?.settings?.country || fields.autoCountry.value || "US").trim().toUpperCase();
+      const options = topCountries.length ? topCountries : [{ code: current || "US", count: 0 }];
+      fields.autoCountry.innerHTML = options.map((item) => {
+        return `<option value="${escapeHtml(item.code)}">${escapeHtml(autoCountryLabel(item.code))}</option>`;
+      }).join("");
+      fields.autoCountry.value = options.some((item) => item.code === current) ? current : options[0].code;
+    }
+
+    function fillAutoPortOptions(ports) {
+      const topPorts = topCatalogPorts(ports);
+      const current = String(state.auto?.settings?.port || fields.autoPort.value || "443").trim();
+      const options = topPorts.length ? topPorts : [{ port: current || "443", count: 0 }];
+      fields.autoPort.innerHTML = options.map((item) => `<option value="${escapeHtml(item.port)}">${escapeHtml(item.port)}</option>`).join("");
+      fields.autoPort.value = options.some((item) => item.port === current) ? current : options[0].port;
     }
 
     async function loadCandidates() {
-      const url = new URL(bootstrap.catalog.queryUrl);
+      const url = new URL(bootstrap.catalog.queryUrl, bootstrap.workerOrigin);
       const country = document.getElementById("countrySelect").value;
       const port = document.getElementById("portSelect").value;
       const status = document.getElementById("statusSelect").value;
@@ -1176,14 +1619,13 @@
       if (port) url.searchParams.set("port", port);
       if (status) url.searchParams.set("status", status);
       url.searchParams.set("limit", String(limit));
-      setStatus("正在拉取候选...");
+      setStatus("正在获取候选...");
       const data = await catalogJson(url.href);
       state.nodes = Array.isArray(data.nodes) ? data.nodes : [];
       state.probe.clear();
-      state.selected = new Set(state.nodes.map(endpointOf).filter(Boolean));
-      document.getElementById("candidateStatus").textContent = "候选 " + state.nodes.length + " 条，可用池匹配 " + (data.total_available ?? "-") + " 条。";
+      state.selected = new Set(filteredProxyNodes().map(endpointOf).filter(Boolean));
       renderCandidates();
-      setStatus("候选已拉取。", "ok");
+      setStatus("候选已获取。", "ok");
     }
 
     async function probeSelected() {
@@ -1206,21 +1648,29 @@
     }
 
     async function saveSelectedProxyip() {
-      const selected = Array.from(state.selected);
-      if (!selected.length) return;
-      fields.proxyip.value = selected.join(",");
-      fields.proxyCount.value = selected.length;
+      const visibleEndpoints = new Set(filteredProxyNodes().map(endpointOf).filter(Boolean));
+      const selected = Array.from(state.selected).filter((proxy) => visibleEndpoints.has(proxy));
+      const custom = cleanProxyipText(document.getElementById("customProxyip").value);
+      const finalProxyip = cleanProxyipText(selected.concat(custom ? custom.split(",") : []).join(","));
+      const count = countList(finalProxyip);
+      if (!count) return;
+      fields.proxyMode.value = "manual";
+      fields.autoEnabled.checked = false;
+      fields.proxyip.value = finalProxyip;
+      fields.proxyCount.value = countList(fields.proxyip.value);
       await saveAll();
-      setStatus("已写入 " + selected.length + " 条 PROXYIP。", "ok");
+      setStatus("已写入 " + count + " 条 PROXYIP。", "ok");
     }
 
     function fillAutoForm(settings) {
-      fields.autoEnabled.checked = Boolean(settings.enabled);
+      fields.autoEnabled.checked = settings.enabled !== false;
+      fields.proxyMode.value = fields.autoEnabled.checked ? "auto" : "manual";
       fields.keepCurrentIfHealthy.checked = settings.keepCurrentIfHealthy !== false;
       fields.requireCountryMatch.checked = settings.requireCountryMatch !== false;
       fields.autoHealOnAllFailed.checked = settings.autoHealOnAllFailed !== false;
       fields.autoCountry.value = settings.country || "US";
-      fields.autoPort.value = settings.port || "";
+      if (!fields.autoCountry.value) fields.autoCountry.value = fields.autoCountry.options[0]?.value || "US";
+      fields.autoPort.value = settings.port || "443";
       fields.autoStatus.value = settings.status || "verified,usable";
       fields.autoCandidateLimit.value = settings.candidateLimit ?? 50;
       fields.autoSaveCount.value = settings.saveCount ?? 3;
@@ -1234,12 +1684,12 @@
 
     function readAutoSettings() {
       return {
-        enabled: fields.autoEnabled.checked,
+        enabled: fields.proxyMode.value === "auto",
         keepCurrentIfHealthy: fields.keepCurrentIfHealthy.checked,
         requireCountryMatch: fields.requireCountryMatch.checked,
         autoHealOnAllFailed: fields.autoHealOnAllFailed.checked,
-        country: fields.autoCountry.value.trim().toUpperCase(),
-        port: fields.autoPort.value.trim(),
+        country: fields.autoCountry.value.trim().toUpperCase() || "US",
+        port: fields.autoPort.value.trim() || "443",
         status: fields.autoStatus.value,
         candidateLimit: normalizedNumber(fields.autoCandidateLimit, 50, 1, 50),
         saveCount: normalizedNumber(fields.autoSaveCount, 3, 1, 10),
@@ -1252,18 +1702,39 @@
       };
     }
 
+    function formatAutoTime(value) {
+      if (!value) return "尚未运行";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return String(value);
+      return date.toLocaleString("zh-CN", { hour12: false });
+    }
+
+    function formatAutoResult(autoState) {
+      const raw = String(autoState.lastResult || autoState.action || "").trim();
+      const labels = {
+        ok: "成功",
+        success: "成功",
+        skipped: "跳过",
+        disabled: "未开启",
+        error: "失败",
+        failed: "失败",
+        replace: "已更换",
+        keep: "保持当前"
+      };
+      return labels[raw] || "暂无结果";
+    }
+
     function renderAutoState(autoState, currentProxyip) {
+      const standbyCount = Array.isArray(autoState.standbyGroups) ? autoState.standbyGroups.length : 0;
       const lines = [
-        "enabled: " + Boolean(fields.autoEnabled.checked),
-        "lastRunAt: " + (autoState.lastRunAt || "-"),
-        "lastResult: " + (autoState.lastResult || autoState.action || "-"),
-        "reason: " + (autoState.reason || autoState.autoHealReason || "-"),
-        "currentFailureCount: " + (autoState.currentFailureCount ?? "-"),
-        "standbyGroups: " + (Array.isArray(autoState.standbyGroups) ? autoState.standbyGroups.length : 0),
-        "nextStandbyGroupIndex: " + (autoState.nextStandbyGroupIndex ?? "-")
+        "状态：" + (fields.autoEnabled.checked ? "已开启" : "未开启"),
+        "上次运行：" + formatAutoTime(autoState.lastRunAt || autoState.finishedAt),
+        "上次结果：" + formatAutoResult(autoState),
+        "失败次数：" + (autoState.currentFailureCount ?? 0),
+        "启动备用：" + standbyCount
       ];
       document.getElementById("autoState").textContent = lines.join("\n");
-      document.getElementById("currentProxyip").textContent = currentProxyip || state.currentProxyip || "";
+      document.getElementById("currentProxyip").textContent = currentProxyip || state.currentProxyip || "暂无";
     }
 
     async function saveAuto() {
@@ -1276,18 +1747,23 @@
     }
 
     async function runAuto(forceReplace) {
-      setStatus(forceReplace ? "正在强制换一组..." : "正在运行自动维护...");
+      setStatus(forceReplace ? "正在保存并强制换一组..." : "正在保存并运行自动维护...");
+      fields.autoEnabled.checked = true;
+      fields.proxyMode.value = "auto";
+      const autoData = await postJson(bootstrap.endpoints.proxyAuto, readAutoSettings());
       const data = await postJson(bootstrap.endpoints.proxyRun, {
         forceEnabled: true,
-        forceReplace: Boolean(forceReplace)
+        forceReplace: true
       });
       if (data.config) {
         state.config = data.config;
         fillForm(state.config, state.addText);
       }
-      if (data.state) {
-        state.auto.state = data.state;
-      }
+      state.auto = {
+        settings: autoData.settings || readAutoSettings(),
+        state: data.state || autoData.state || state.auto?.state || {}
+      };
+      fillAutoForm(state.auto.settings);
       renderAutoState(state.auto.state || {}, data.currentProxyip || "");
       setStatus("自动维护运行完成。", "ok");
     }
@@ -1321,6 +1797,7 @@
       });
       document.getElementById("saveConfig").addEventListener("click", () => saveAll().catch(showError));
       document.getElementById("saveAll").addEventListener("click", () => saveAll().catch(showError));
+      document.getElementById("saveSubName").addEventListener("click", () => saveAll().catch(showError));
       document.getElementById("reloadState").addEventListener("click", () => loadState().catch(showError));
       document.getElementById("logoutButton").addEventListener("click", () => logout().catch(showError));
       document.getElementById("refreshEntries").addEventListener("click", () => refreshEntries().catch(showError));
@@ -1328,11 +1805,40 @@
       document.getElementById("probeSelected").addEventListener("click", () => probeSelected().catch(showError));
       document.getElementById("selectOk").addEventListener("click", selectOk);
       document.getElementById("saveSelected").addEventListener("click", () => saveSelectedProxyip().catch(showError));
+      document.getElementById("cancelProxyip").addEventListener("click", resetProxyPicker);
+      document.getElementById("proxyCountryButtons").addEventListener("click", (event) => {
+        const button = event.target.closest("[data-country]");
+        if (!button) return;
+        setProxyCountry(button.dataset.country || "");
+      });
+      document.querySelectorAll(".proxyip-tab").forEach((button) => {
+        button.addEventListener("click", () => setProxyIpVersion(button.dataset.ipVersion || "4"));
+      });
+      document.getElementById("customProxyip").addEventListener("input", renderCandidates);
       document.getElementById("saveAuto").addEventListener("click", () => saveAuto().catch(showError));
       document.getElementById("runAuto").addEventListener("click", () => runAuto(false).catch(showError));
       document.getElementById("forceReplace").addEventListener("click", () => runAuto(true).catch(showError));
+      fields.proxyMode.addEventListener("change", () => {
+        fields.autoEnabled.checked = fields.proxyMode.value === "auto";
+      });
+      fields.autoEnabled.addEventListener("change", () => {
+        fields.proxyMode.value = fields.autoEnabled.checked ? "auto" : "manual";
+      });
+      fields.autoCountry.addEventListener("change", () => {
+        fields.autoEnabled.checked = true;
+        fields.proxyMode.value = "auto";
+      });
+      fields.autoPort.addEventListener("change", () => {
+        fields.autoEnabled.checked = true;
+        fields.proxyMode.value = "auto";
+      });
       document.getElementById("toggleAll").addEventListener("change", (event) => {
-        state.selected = event.target.checked ? new Set(state.nodes.map(endpointOf).filter(Boolean)) : new Set();
+        const visible = filteredProxyNodes().map(endpointOf).filter(Boolean);
+        if (event.target.checked) {
+          visible.forEach((proxy) => state.selected.add(proxy));
+        } else {
+          visible.forEach((proxy) => state.selected.delete(proxy));
+        }
         renderCandidates();
       });
       document.getElementById("tbody").addEventListener("change", (event) => {
