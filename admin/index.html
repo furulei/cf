@@ -230,7 +230,8 @@
       align-items: start;
     }
     .config-layout {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+      align-items: stretch;
     }
     .basic-config-panel[hidden] {
       display: none;
@@ -242,8 +243,8 @@
       box-sizing: border-box;
       display: grid;
       gap: 14px;
-      width: 66.666%;
-      margin-right: auto;
+      width: 100%;
+      margin-right: 0;
     }
     .proxy-controls {
       display: grid;
@@ -291,6 +292,147 @@
     }
     .panel.flat {
       box-shadow: none;
+    }
+    .globe-card {
+      position: relative;
+      min-height: 100%;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(155, 210, 255, 0.12), transparent 36%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.018));
+    }
+    .globe-card::before,
+    .globe-card::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      border-radius: 999px;
+    }
+    .globe-card::before {
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(111, 183, 255, 0.18), transparent 66%);
+      filter: blur(18px);
+      opacity: 0.65;
+    }
+    .globe-card::after {
+      inset: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .globe-stage {
+      position: relative;
+      width: min(280px, 100%);
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+    }
+    .mini-globe {
+      position: relative;
+      width: 78%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 38% 28%, rgba(255, 255, 255, 0.22), transparent 28%),
+        radial-gradient(circle at 62% 72%, rgba(73, 147, 255, 0.1), transparent 42%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(8, 12, 24, 0.18));
+      border: 1px solid rgba(255, 255, 255, 0.48);
+      box-shadow:
+        inset -28px -24px 60px rgba(0, 0, 0, 0.28),
+        inset 16px 14px 28px rgba(255, 255, 255, 0.08),
+        0 0 42px rgba(98, 169, 255, 0.16);
+      animation: globeFloat 5.4s ease-in-out infinite;
+      z-index: 2;
+    }
+    .mini-globe::after {
+      content: "";
+      position: absolute;
+      inset: 5%;
+      border-radius: 50%;
+      border-left: 1px solid rgba(255, 255, 255, 0.36);
+      filter: blur(0.2px);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+    .globe-svg {
+      position: absolute;
+      inset: -3%;
+      width: 106%;
+      height: 106%;
+      opacity: 0.9;
+      animation: globeDrift 8s ease-in-out infinite alternate;
+    }
+    .globe-orbit {
+      --orbit-x: 66deg;
+      --orbit-z: -28deg;
+      position: absolute;
+      inset: 11%;
+      border: 1px solid rgba(116, 190, 255, 0.5);
+      border-radius: 50%;
+      transform: rotateX(var(--orbit-x)) rotateZ(var(--orbit-z));
+      box-shadow: 0 0 16px rgba(102, 179, 255, 0.18);
+      z-index: 3;
+      animation: orbitSweep 7s linear infinite;
+    }
+    .globe-orbit.orbit-two {
+      --orbit-x: 70deg;
+      --orbit-z: 35deg;
+      inset: 17%;
+      border-color: rgba(215, 231, 255, 0.42);
+      animation-duration: 9s;
+      animation-direction: reverse;
+    }
+    .orbit-dot {
+      position: absolute;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #7fc5ff;
+      box-shadow: 0 0 14px rgba(127, 197, 255, 0.9);
+      transform: translate(-50%, -50%);
+    }
+    .globe-orbit .orbit-dot {
+      left: 10%;
+      top: 48%;
+    }
+    .orbit-two .orbit-dot {
+      left: 82%;
+      top: 54%;
+    }
+    .globe-caption {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.52);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    @keyframes globeFloat {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+    @keyframes globeDrift {
+      from {
+        transform: translateX(-7px) rotate(-1deg);
+      }
+      to {
+        transform: translateX(7px) rotate(1deg);
+      }
+    }
+    @keyframes orbitSweep {
+      to {
+        transform: rotateX(var(--orbit-x)) rotateZ(calc(var(--orbit-z) + 360deg));
+      }
     }
     .grid {
       display: grid;
@@ -824,6 +966,12 @@
       .proxy-panel {
         width: 100%;
       }
+      .globe-card {
+        min-height: 260px;
+      }
+      .globe-stage {
+        width: min(230px, 100%);
+      }
       .grid,
       .grid.three {
         grid-template-columns: 1fr;
@@ -948,6 +1096,32 @@
             <button id="refreshEntries" class="ghost" type="button">刷新入口</button>
           </div>
         </section>
+        <aside class="panel globe-card" aria-hidden="true">
+          <div class="globe-stage">
+            <div class="globe-orbit"><span class="orbit-dot"></span></div>
+            <div class="globe-orbit orbit-two"><span class="orbit-dot"></span></div>
+            <div class="mini-globe">
+              <svg class="globe-svg" viewBox="0 0 320 320" role="presentation" focusable="false">
+                <defs>
+                  <clipPath id="globeClip">
+                    <circle cx="160" cy="160" r="147"></circle>
+                  </clipPath>
+                  <pattern id="landDots" width="9" height="9" patternUnits="userSpaceOnUse">
+                    <circle cx="3.5" cy="3.5" r="1.75" fill="#f6faff" opacity="0.82"></circle>
+                  </pattern>
+                </defs>
+                <g clip-path="url(#globeClip)">
+                  <path fill="url(#landDots)" opacity="0.92" d="M54 116c16-32 52-50 84-44 15 3 25 12 37 21-11 4-22 11-22 22 0 10 10 16 22 21-7 11-18 15-34 12-17-4-27 3-37 17-12 16-25 17-42 8-20-11-24-34-8-57Z"></path>
+                  <path fill="url(#landDots)" opacity="0.92" d="M121 172c18 6 34 24 36 45 2 22-8 41-18 57-12-18-24-37-28-58-3-15 0-27 10-44Z"></path>
+                  <path fill="url(#landDots)" opacity="0.94" d="M151 92c31-19 79-17 111 5 27 18 40 49 31 79-11 36-47 56-84 49-12-2-22-9-32-17-17-13-37-19-58-20 8-14 23-21 42-21 17 0 25-8 21-21-4-13-24-12-31-25-4-7-2-15 0-29Z"></path>
+                  <path fill="url(#landDots)" opacity="0.88" d="M197 211c20 6 35 23 37 43 2 17-7 29-18 39-15-12-26-31-28-51-1-12 2-22 9-31Z"></path>
+                  <path fill="url(#landDots)" opacity="0.74" d="M235 64c16 2 29 8 39 18-17 0-30 0-43-4-8-2-8-10 4-14Z"></path>
+                </g>
+              </svg>
+            </div>
+            <div class="globe-caption">IP168 EDGE</div>
+          </div>
+        </aside>
       </div>
     </section>
 
