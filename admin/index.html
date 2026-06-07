@@ -26,10 +26,16 @@
       --control-bg-active: rgba(255, 255, 255, 0.175);
       --hairline: rgba(255, 255, 255, 0.34);
       --shadow: 0 18px 42px rgba(0, 0, 0, 0.16);
+      --control-height: 52px;
+      --control-font-size: 16px;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     * {
       box-sizing: border-box;
+    }
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
     }
     body {
       margin: 0;
@@ -184,8 +190,10 @@
       flex: 1 1 360px;
     }
     #logoutButton {
-      width: auto;
-      min-width: 86px;
+      width: 96px;
+      min-width: 96px;
+      height: 44px;
+      min-height: 44px;
       white-space: nowrap;
     }
     .tabs {
@@ -231,8 +239,11 @@
       align-items: stretch;
     }
     .proxy-panel {
+      box-sizing: border-box;
       display: grid;
       gap: 14px;
+      width: 66.666%;
+      margin-right: auto;
     }
     .proxy-controls {
       display: grid;
@@ -245,7 +256,8 @@
     }
     .proxy-controls :is(select, input, button) {
       width: 100%;
-      min-height: 58px;
+      height: var(--control-height);
+      min-height: var(--control-height);
       justify-self: stretch;
     }
     .proxy-editors {
@@ -260,7 +272,9 @@
       font-weight: 700;
     }
     .proxy-editors textarea {
-      min-height: 330px;
+      height: clamp(220px, 34vh, 340px);
+      min-height: 220px;
+      white-space: pre;
     }
     .proxy-actions {
       margin-top: 2px;
@@ -394,11 +408,14 @@
       background: #f5f5f5;
     }
     button {
-      min-height: 58px;
-      padding: 1px 6px;
+      height: var(--control-height);
+      min-height: var(--control-height);
+      padding: 0 14px;
       border-color: var(--line);
       background: var(--control-bg);
       color: var(--text);
+      font-size: var(--control-font-size);
+      line-height: 1.2;
       font-weight: 520;
       text-transform: none;
       cursor: pointer;
@@ -463,8 +480,9 @@
     .link-row button {
       min-width: 0;
       width: 100%;
-      min-height: 58px;
-      padding: 1px 6px;
+      height: var(--control-height);
+      min-height: var(--control-height);
+      padding: 0 10px;
     }
     .compact-qr-panel {
       align-self: stretch;
@@ -688,8 +706,8 @@
       border-radius: 4px;
       background: var(--panel-soft);
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 11px;
+      line-height: 1.45;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
     }
@@ -803,6 +821,9 @@
       header {
         display: grid;
       }
+      .proxy-panel {
+        width: 100%;
+      }
       .grid,
       .grid.three {
         grid-template-columns: 1fr;
@@ -821,7 +842,7 @@
         min-width: 0;
       }
       #logoutButton {
-        width: 100%;
+        width: 96px;
       }
     }
     @media (max-width: 430px) {
@@ -1198,6 +1219,10 @@
       return cleanProxyipText(text).split(",").filter(Boolean).length;
     }
 
+    function displayProxyipText(text) {
+      return cleanProxyipText(text).split(",").filter(Boolean).join("\n");
+    }
+
     function endpointOf(node) {
       return node?.proxy || (node?.ip && node?.port ? node.ip + ":" + node.port : "");
     }
@@ -1258,7 +1283,7 @@
       fields.echSni.value = ech.SNI || "";
       fields.addText.value = addText || "";
       fields.proxyMode.value = fields.autoEnabled?.checked ? "auto" : "manual";
-      fields.proxyip.value = proxy.PROXYIP || "";
+      fields.proxyip.value = displayProxyipText(proxy.PROXYIP || "");
       fields.proxyCount.value = countList(proxy.PROXYIP || "");
       renderLinks();
     }
@@ -1280,9 +1305,9 @@
       proxy.Mode = "proxy-only";
       if (fields.proxyMode.value === "manual") {
         proxy.PROXYIP = cleanProxyipText(fields.proxyip.value);
-        fields.proxyip.value = proxy.PROXYIP;
+        fields.proxyip.value = displayProxyipText(proxy.PROXYIP);
       } else {
-        fields.proxyip.value = proxy.PROXYIP || "";
+        fields.proxyip.value = displayProxyipText(proxy.PROXYIP || "");
       }
       fields.proxyCount.value = countList(proxy.PROXYIP);
       sub.TOKEN = fields.token.value.trim();
@@ -1656,7 +1681,7 @@
       if (!count) return;
       fields.proxyMode.value = "manual";
       fields.autoEnabled.checked = false;
-      fields.proxyip.value = finalProxyip;
+      fields.proxyip.value = displayProxyipText(finalProxyip);
       fields.proxyCount.value = countList(fields.proxyip.value);
       await saveAll();
       setStatus("已写入 " + count + " 条 PROXYIP。", "ok");
