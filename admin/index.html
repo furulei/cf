@@ -1613,7 +1613,11 @@
       if (!token) return "";
       const url = new URL(bootstrap.subPath, bootstrap.workerOrigin);
       url.searchParams.set("token", token);
-      return flag ? url.href + "&" + flag : url.href;
+      if (flag) {
+        url.searchParams.set(flag, "");
+      }
+      url.hash = fields.subName.value.trim() || DEFAULT_SUB_NAME;
+      return url.href;
     }
 
     function renderLinks() {
