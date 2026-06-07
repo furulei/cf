@@ -28,6 +28,7 @@
       --shadow: 0 18px 42px rgba(0, 0, 0, 0.16);
       --control-height: 52px;
       --control-font-size: 16px;
+      --auto-panel-width: 394px;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     * {
@@ -905,7 +906,8 @@
       gap: 12px;
     }
     #autoView .split {
-      width: min(590px, 100%);
+      width: min(var(--auto-panel-width), 100%);
+      max-width: var(--auto-panel-width);
       grid-template-columns: 1fr;
     }
     .state-box {
@@ -925,8 +927,8 @@
       display: grid;
       align-content: start;
       gap: 14px;
-      width: min(590px, 100%);
-      max-width: 590px;
+      width: min(var(--auto-panel-width), 100%);
+      max-width: var(--auto-panel-width);
     }
     .auto-status-layout {
       grid-template-columns: 1fr;
@@ -2238,13 +2240,32 @@
       window.location.href = bootstrap.adminBase;
     }
 
+    function syncAutoPanelWidth() {
+      const tabs = Array.from(document.querySelectorAll(".tabs .tab"));
+      if (!tabs.length) return;
+      const rects = tabs.map((item) => item.getBoundingClientRect()).filter((rect) => rect.width > 0);
+      if (!rects.length) return;
+      const left = Math.min(...rects.map((rect) => rect.left));
+      const right = Math.max(...rects.map((rect) => rect.right));
+      const width = Math.ceil(right - left);
+      if (width > 0) {
+        document.documentElement.style.setProperty("--auto-panel-width", width + "px");
+      }
+    }
+
     function bindEvents() {
+      syncAutoPanelWidth();
+      window.addEventListener("resize", syncAutoPanelWidth);
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(syncAutoPanelWidth).observe(document.querySelector(".tabs"));
+      }
       document.querySelectorAll(".tab").forEach((button) => {
         button.addEventListener("click", () => {
           document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
           document.querySelectorAll(".view").forEach((item) => item.classList.remove("active"));
           button.classList.add("active");
           document.getElementById(button.dataset.view).classList.add("active");
+          syncAutoPanelWidth();
         });
       });
       document.getElementById("saveConfig").addEventListener("click", () => saveAll().catch(showError));
