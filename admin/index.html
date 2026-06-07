@@ -1398,6 +1398,7 @@
       selected: new Set(),
       probe: new Map(),
       proxyIpVersion: "4",
+      catalogSummary: null,
       links: {},
       qrUrl: ""
     };
@@ -1883,20 +1884,49 @@
       document.getElementById("candidateStatus").textContent = "已选 " + visibleSelectedCount + "/" + nodes.length;
     }
 
-    async function loadSummary() {
-      const data = await catalogJson(bootstrap.catalog.summaryUrl);
+    function catalogCountryList(summary, version) {
+      const type = String(version) === "6" ? "ipv6" : "ipv4";
+      if (Array.isArray(summary?.countries)) {
+        return summary.countries;
+      }
+      if (Array.isArray(summary?.files?.[type]?.topCountries)) {
+        return summary.files[type].topCountries;
+      }
+      const countryMap = summary?.countries?.[type];
+      if (countryMap && typeof countryMap === "object") {
+        return Object.entries(countryMap).map(([code, count]) => ({ code, count }));
+      }
+      return [];
+    }
+
+    function catalogPortList(summary, version) {
+      if (Array.isArray(summary?.ports)) {
+        return summary.ports;
+      }
+      const type = String(version) === "6" ? "ipv6" : "ipv4";
+      const count = Number(summary?.files?.[type]?.total || 0);
+      return [{ port: String(summary?.port || "443"), count }];
+    }
+
+    function applyCatalogSummary(version) {
+      const data = state.catalogSummary || {};
       const countrySelect = document.getElementById("countrySelect");
       const portSelect = document.getElementById("portSelect");
-      const countries = Array.isArray(data.countries) ? data.countries : [];
-      const ports = Array.isArray(data.ports) ? data.ports : [];
-      countrySelect.innerHTML = '<option value="">全部国家</option>' + countries.map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.code + " (" + item.count + ")")}</option>`).join("");
+      const countries = catalogCountryList(data, version);
+      const ports = catalogPortList(data, version);
+      countrySelect.innerHTML = '<option value="">??????</option>' + countries.map((item) => `<option value="${escapeHtml(item.code)}">${escapeHtml(item.code + " (" + item.count + ")")}</option>`).join("");
       const topPorts = topCatalogPorts(ports);
       portSelect.innerHTML = topPorts.map((item) => `<option value="${escapeHtml(item.port)}">${escapeHtml(item.port)}</option>`).join("");
       portSelect.value = topPorts.some((item) => item.port === "443") ? "443" : topPorts[0]?.port || "443";
       renderProxyCountryButtons(countries);
-      fillAutoCountryOptions(countries);
-      fillAutoPortOptions(ports);
-      document.getElementById("candidateStatus").textContent = "已选 0/0";
+      document.getElementById("candidateStatus").textContent = "????0/0";
+    }
+
+    async function loadSummary() {
+      state.catalogSummary = await catalogJson(bootstrap.catalog.summaryUrl);
+      applyCatalogSummary(state.proxyIpVersion);
+      fillAutoCountryOptions(catalogCountryList(state.catalogSummary, "4"));
+      fillAutoPortOptions(catalogPortList(state.catalogSummary, "4"));
     }
 
     function topCatalogPorts(ports) {
@@ -1948,7 +1978,10 @@
       document.querySelectorAll(".proxyip-tab").forEach((button) => {
         button.classList.toggle("active", button.dataset.ipVersion === state.proxyIpVersion);
       });
-      state.selected = new Set(filteredProxyNodes().map(endpointOf).filter(Boolean));
+      applyCatalogSummary(state.proxyIpVersion);
+      state.nodes = [];
+      state.probe.clear();
+      state.selected.clear();
       renderCandidates();
     }
 
@@ -1983,7 +2016,45 @@
       fields.autoPort.value = options.some((item) => item.port === current) ? current : options[0].port;
     }
 
+    function catalogNodesUrl(version) {
+      if (String(version) === "6" && bootstrap.catalog.ipv6Url) return bootstrap.catalog.ipv6Url;
+      if (bootstrap.catalog.ipv4Url) return bootstrap.catalog.ipv4Url;
+      return "";
+    }
+
+    function catalogStatusMatches(node, status) {
+      const value = String(status || "verified,usable").trim().toLowerCase();
+      if (!value || value === "all") return true;
+      const allowed = new Set(value.split(",").map((item) => item.trim()).filter(Boolean));
+      return allowed.has(String(node?.status || "").trim().toLowerCase());
+    }
+
+    async function loadCatalogFileCandidates() {
+      const country = document.getElementById("countrySelect").value;
+      const port = document.getElementById("portSelect").value;
+      const status = document.getElementById("statusSelect").value;
+      const limit = normalizedNumber(document.getElementById("limitInput"), 50, 1, 100);
+      const data = await catalogJson(catalogNodesUrl(state.proxyIpVersion));
+      return {
+        nodes: (Array.isArray(data.nodes) ? data.nodes : []).filter((node) => {
+          if (country && String(node.country || "").trim().toUpperCase() !== country) return false;
+          if (port && String(node.port || "").trim() !== String(port).trim()) return false;
+          return catalogStatusMatches(node, status);
+        }).slice(0, limit)
+      };
+    }
+
     async function loadCandidates() {
+      if (catalogNodesUrl(state.proxyIpVersion)) {
+        setStatus("姝ｅ湪鑾峰彇鍊欓€?..");
+        const data = await loadCatalogFileCandidates();
+        state.nodes = Array.isArray(data.nodes) ? data.nodes : [];
+        state.probe.clear();
+        state.selected = new Set(filteredProxyNodes().map(endpointOf).filter(Boolean));
+        renderCandidates();
+        setStatus("鍊欓€夊凡鑾峰彇銆?, "ok");
+        return;
+      }
       const url = new URL(bootstrap.catalog.queryUrl, bootstrap.workerOrigin);
       const country = document.getElementById("countrySelect").value;
       const port = document.getElementById("portSelect").value;
