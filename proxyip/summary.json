@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "port": 443,
+  "updatedAt": "2026-06-07T21:29:10.059Z",
+  "source": {
+    "name": "YOYO proxy catalog",
+    "url": "https://zip.cm.edu.kg/all.json",
+    "generatedAt": "2026-06-07T03:45:32.166232",
+    "total": 12313,
+    "rawPort443": 8615,
+    "uniquePort443": 8615,
+    "skippedInvalid": 0
+  },
+  "files": {
+    "ipv4": {
+      "path": "proxyip/ipv4.json",
+      "total": 8615,
+      "countries": 66,
+      "topCountries": [
+        {
+          "code": "DE",
+          "count": 1755
+        },
+        {
+          "code": "NL",
+          "count": 1580
+        },
+        {
+          "code": "US",
+          "count": 976
+        },
+        {
+          "code": "GB",
+          "count": 896
+        },
+        {
+          "code": "FI",
+          "count": 757
+        },
+        {
+          "code": "SG",
+          "count": 483
+        },
+        {
+          "code": "FR",
+          "count": 434
+        },
+        {
+          "code": "JP",
+          "count": 208
+        },
+        {
+          "code": "RU",
+          "count": 190
+        },
+        {
+          "code": "SE",
+          "count": 186
+        },
+        {
+          "code": "LV",
+          "count": 183
+        },
+        {
+          "code": "PL",
+          "count": 109
+        },
+        {
+          "code": "ES",
+          "count": 101
+        },
+        {
+          "code": "CH",
+          "count": 93
+        },
+        {
+          "code": "EE",
+          "count": 81
+        },
+        {
+          "code": "HK",
+          "count": 72
+        },
+        {
+          "code": "CA",
+          "count": 61
+        },
+        {
+          "code": "CZ",
+          "count": 47
+        },
+        {
+          "code": "TR",
+          "count": 44
+        },
+        {
+          "code": "KR",
+          "count": 40
+        }
+      ]
+    },
+    "ipv6": {
+      "path": "proxyip/ipv6.json",
+      "total": 0,
+      "countries": 0,
+      "topCountries": []
+    }
+  },
+  "countries": {
+    "ipv4": {
+      "DE": 1755,
+      "NL": 1580,
+      "US": 976,
+      "GB": 896,
+      "FI": 757,
+      "SG": 483,
+      "FR": 434,
+      "JP": 208,
+      "RU": 190,
+      "SE": 186,
+      "LV": 183,
+      "PL": 109,
+      "ES": 101,
+      "CH": 93,
+      "EE": 81,
+      "HK": 72,
+      "CA": 61,
+      "CZ": 47,
+      "TR": 44,
+      "KR": 40,
+      "KZ": 37,
+      "AT": 34,
+      "AU": 26,
+      "BG": 25,
+      "IN": 24,
+      "RO": 18,
+      "TH": 14,
+      "DK": 13,
+      "TW": 10,
+      "BE": 8,
+      "HU": 8,
+      "MY": 8,
+      "IT": 7,
+      "AE": 6,
+      "LT": 6,
+      "CY": 5,
+      "IE": 5,
+      "MD": 5,
+      "RS": 5,
+      "AL": 4,
+      "BR": 4,
+      "IS": 4,
+      "ZA": 4,
+      "AM": 3,
+      "IL": 3,
+      "MK": 3,
+      "MX": 3,
+      "NO": 3,
+      "VN": 3,
+      "BY": 2,
+      "ID": 2,
+      "SK": 2,
+      "UA": 2,
+      "AR": 1,
+      "CL": 1,
+      "DO": 1,
+      "EC": 1,
+      "EG": 1,
+      "GE": 1,
+      "GR": 1,
+      "HR": 1,
+      "KG": 1,
+      "KH": 1,
+      "QA": 1,
+      "UNKNOWN": 1,
+      "UZ": 1
+    },
+    "ipv6": {}
+  }
+}
