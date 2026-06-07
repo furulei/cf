@@ -156,12 +156,15 @@
       z-index: 30;
       min-width: 118px;
       padding: 12px 22px;
-      border: 1px solid rgba(255, 255, 255, 0.32);
+      border: 1px solid rgba(255, 255, 255, 0.28);
       border-radius: 999px;
-      background: rgba(22, 27, 36, 0.86);
+      background:
+        linear-gradient(135deg, rgba(89, 68, 70, 0.88), rgba(30, 33, 43, 0.9)),
+        radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.18), transparent 42%);
       box-shadow:
         0 18px 46px rgba(0, 0, 0, 0.34),
-        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+        0 0 28px rgba(98, 169, 255, 0.14),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
       color: #fff;
       font-size: 16px;
       font-weight: 760;
@@ -290,10 +293,38 @@
       font-size: 18px;
       font-weight: 700;
     }
+    .proxy-textarea-wrap {
+      position: relative;
+      min-height: 220px;
+    }
     .proxy-editor-card textarea {
       height: clamp(220px, 34vh, 340px);
       min-height: 220px;
       white-space: pre;
+    }
+    .proxy-exit-card.auto-mode textarea {
+      color: transparent;
+      caret-color: transparent;
+      resize: none;
+    }
+    .proxy-auto-hint {
+      position: absolute;
+      inset: 1px;
+      display: grid;
+      place-items: center;
+      border-radius: 4px;
+      pointer-events: none;
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 20px;
+      font-weight: 760;
+      letter-spacing: 0.04em;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(98, 169, 255, 0.14), transparent 34%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.035), rgba(0, 0, 0, 0.05));
+      text-shadow: 0 8px 24px rgba(0, 0, 0, 0.36);
+    }
+    .proxy-auto-hint[hidden] {
+      display: none;
     }
     .proxy-editor-actions {
       display: grid;
@@ -310,11 +341,16 @@
     }
     .proxy-mode-inline {
       min-width: 0;
-      display: grid;
-      gap: 6px;
-      font-size: 14px;
-      font-weight: 560;
-      color: var(--muted);
+      display: block;
+    }
+    #proxyMode {
+      color-scheme: dark;
+      border-color: var(--line);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.035)),
+        var(--control-bg);
+      color: var(--text);
+      font-weight: 700;
     }
     .panel {
       background: var(--panel);
@@ -574,8 +610,8 @@
         0 18px 42px rgba(0, 0, 0, 0.18);
     }
     select option {
-      color: #202028;
-      background: #f5f5f5;
+      color: #f7f7f7;
+      background: #2d282c;
     }
     button {
       height: var(--control-height);
@@ -1113,15 +1149,18 @@
             </section>
             <section class="proxy-editor-card proxy-exit-card">
               <label class="proxy-editor-title" for="proxyip">出口IP</label>
-              <textarea id="proxyip" class="mono" spellcheck="false"></textarea>
+              <div class="proxy-textarea-wrap">
+                <textarea id="proxyip" class="mono" spellcheck="false"></textarea>
+                <div id="proxyAutoHint" class="proxy-auto-hint" hidden>自动模式</div>
+              </div>
               <div class="proxy-editor-actions">
                 <button id="saveProxyip" type="button">保存出口</button>
-                <label class="proxy-mode-inline" for="proxyMode">模式
-                  <select id="proxyMode">
+                <div class="proxy-mode-inline">
+                  <select id="proxyMode" aria-label="模式">
                     <option value="auto">自动</option>
                     <option value="manual">手动</option>
                   </select>
-                </label>
+                </div>
                 <input id="proxyCount" readonly hidden>
               </div>
             </section>
@@ -1326,6 +1365,7 @@
     const saveNoticeEl = document.getElementById("saveNotice");
     let saveNoticeActive = false;
     let saveNoticeTimer = 0;
+    let proxyipManualDraft = "";
 
     if (!injected) {
       document.body.classList.add("missing-entry");
@@ -1375,6 +1415,8 @@
       addText: document.getElementById("addText"),
       proxyMode: document.getElementById("proxyMode"),
       proxyip: document.getElementById("proxyip"),
+      proxyAutoHint: document.getElementById("proxyAutoHint"),
+      proxyExitCard: document.querySelector(".proxy-exit-card"),
       proxyCount: document.getElementById("proxyCount"),
       autoEnabled: document.getElementById("autoEnabled"),
       keepCurrentIfHealthy: document.getElementById("keepCurrentIfHealthy"),
@@ -1451,6 +1493,27 @@
       return cleanProxyipText(text).split(",").filter(Boolean).join("\n");
     }
 
+    function currentSavedProxyipText() {
+      return displayProxyipText(state.config?.[PROXY_KEY]?.PROXYIP || "");
+    }
+
+    function syncProxyModeView() {
+      const isAuto = fields.proxyMode.value === "auto";
+      if (isAuto && !fields.proxyip.readOnly) {
+        proxyipManualDraft = fields.proxyip.value;
+      }
+      fields.proxyip.readOnly = isAuto;
+      fields.proxyip.setAttribute("aria-readonly", isAuto ? "true" : "false");
+      fields.proxyExitCard?.classList.toggle("auto-mode", isAuto);
+      fields.proxyAutoHint.hidden = !isAuto;
+      if (isAuto) {
+        fields.proxyip.value = "";
+      } else if (!fields.proxyip.value.trim()) {
+        fields.proxyip.value = proxyipManualDraft || currentSavedProxyipText();
+      }
+      fields.proxyCount.value = countList(fields.proxyip.value || currentSavedProxyipText());
+    }
+
     function endpointOf(node) {
       return node?.proxy || (node?.ip && node?.port ? node.ip + ":" + node.port : "");
     }
@@ -1511,7 +1574,8 @@
       fields.echSni.value = ech.SNI || "";
       fields.addText.value = addText || "";
       fields.proxyMode.value = fields.autoEnabled?.checked ? "auto" : "manual";
-      fields.proxyip.value = displayProxyipText(proxy.PROXYIP || "");
+      proxyipManualDraft = displayProxyipText(proxy.PROXYIP || "");
+      fields.proxyip.value = proxyipManualDraft;
       fields.proxyCount.value = countList(proxy.PROXYIP || "");
       renderLinks();
     }
@@ -1695,8 +1759,11 @@
       const config = clone(state.config);
       const proxy = { ...(config[PROXY_KEY] || {}) };
       proxy.Mode = "proxy-only";
-      proxy.PROXYIP = cleanProxyipText(fields.proxyip.value);
-      fields.proxyip.value = displayProxyipText(proxy.PROXYIP);
+      if (fields.proxyMode.value === "manual") {
+        proxy.PROXYIP = cleanProxyipText(fields.proxyip.value);
+        proxyipManualDraft = displayProxyipText(proxy.PROXYIP);
+        fields.proxyip.value = proxyipManualDraft;
+      }
       fields.proxyCount.value = countList(proxy.PROXYIP);
       config[PROXY_KEY] = proxy;
       return config;
@@ -1984,6 +2051,7 @@
       fields.autoHealCooldownMinutes.value = settings.autoHealCooldownMinutes ?? 10;
       fields.standbyGroupCount.value = settings.standbyGroupCount ?? 2;
       fields.standbyGroupSize.value = settings.standbyGroupSize ?? 3;
+      syncProxyModeView();
     }
 
     function readAutoSettings() {
@@ -2125,17 +2193,21 @@
       document.getElementById("forceReplace").addEventListener("click", () => runAuto(true).catch(showError));
       fields.proxyMode.addEventListener("change", () => {
         fields.autoEnabled.checked = fields.proxyMode.value === "auto";
+        syncProxyModeView();
       });
       fields.autoEnabled.addEventListener("change", () => {
         fields.proxyMode.value = fields.autoEnabled.checked ? "auto" : "manual";
+        syncProxyModeView();
       });
       fields.autoCountry.addEventListener("change", () => {
         fields.autoEnabled.checked = true;
         fields.proxyMode.value = "auto";
+        syncProxyModeView();
       });
       fields.autoPort.addEventListener("change", () => {
         fields.autoEnabled.checked = true;
         fields.proxyMode.value = "auto";
+        syncProxyModeView();
       });
       document.getElementById("toggleAll").addEventListener("change", (event) => {
         const visible = filteredProxyNodes().map(endpointOf).filter(Boolean);
