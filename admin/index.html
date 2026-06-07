@@ -149,6 +149,32 @@
       color: var(--red);
       border-color: rgba(255, 209, 209, 0.45);
     }
+    .save-notice {
+      position: fixed;
+      left: 50%;
+      bottom: 34px;
+      z-index: 30;
+      min-width: 118px;
+      padding: 12px 22px;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      border-radius: 999px;
+      background: rgba(22, 27, 36, 0.86);
+      box-shadow:
+        0 18px 46px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 760;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 18px) scale(0.96);
+      transition: opacity 180ms ease, transform 220ms ease;
+    }
+    .save-notice.active {
+      opacity: 1;
+      transform: translate(-50%, 0) scale(1);
+    }
     .subscription-panel {
       --sub-button-width: 144px;
       --sub-button-gap: 8px;
@@ -246,39 +272,49 @@
       width: 100%;
       margin-right: 0;
     }
-    .proxy-controls {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      align-items: end;
-    }
-    .proxy-controls label {
-      min-width: 0;
-    }
-    .proxy-controls :is(select, input, button) {
-      width: 100%;
-      height: var(--control-height);
-      min-height: var(--control-height);
-      justify-self: stretch;
-    }
     .proxy-editors {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
       align-items: stretch;
     }
-    .proxy-editors label {
+    .proxy-editor-card {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 10px;
       align-content: start;
+    }
+    .proxy-editor-title,
+    .proxy-mode-inline {
       font-size: 18px;
       font-weight: 700;
     }
-    .proxy-editors textarea {
+    .proxy-editor-card textarea {
       height: clamp(220px, 34vh, 340px);
       min-height: 220px;
       white-space: pre;
     }
-    .proxy-actions {
+    .proxy-editor-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      align-items: end;
       margin-top: 2px;
+    }
+    .proxy-editor-actions :is(button, select) {
+      width: 100%;
+      height: var(--control-height);
+      min-height: var(--control-height);
+      justify-self: stretch;
+    }
+    .proxy-mode-inline {
+      min-width: 0;
+      display: grid;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 560;
+      color: var(--muted);
     }
     .panel {
       background: var(--panel);
@@ -1067,25 +1103,28 @@
 
         <section class="panel proxy-panel">
           <div class="proxy-editors">
-            <label>入口IP
+            <section class="proxy-editor-card proxy-entry-card">
+              <label class="proxy-editor-title" for="addText">入口IP</label>
               <textarea id="addText" class="mono" spellcheck="false"></textarea>
-            </label>
-            <label>落地IP
+              <div class="proxy-editor-actions">
+                <button id="saveEntry" type="button">保存入口</button>
+                <button id="refreshEntries" class="ghost" type="button">刷新入口</button>
+              </div>
+            </section>
+            <section class="proxy-editor-card proxy-exit-card">
+              <label class="proxy-editor-title" for="proxyip">出口IP</label>
               <textarea id="proxyip" class="mono" spellcheck="false"></textarea>
-            </label>
-          </div>
-          <div class="proxy-controls proxy-actions">
-            <label>模式
-              <select id="proxyMode">
-                <option value="auto">自动</option>
-                <option value="manual">手动</option>
-              </select>
-            </label>
-            <label>数量
-              <input id="proxyCount" readonly>
-            </label>
-            <button id="saveAll" type="button">保存全部</button>
-            <button id="refreshEntries" class="ghost" type="button">刷新入口</button>
+              <div class="proxy-editor-actions">
+                <button id="saveProxyip" type="button">保存出口</button>
+                <label class="proxy-mode-inline" for="proxyMode">模式
+                  <select id="proxyMode">
+                    <option value="auto">自动</option>
+                    <option value="manual">手动</option>
+                  </select>
+                </label>
+                <input id="proxyCount" readonly hidden>
+              </div>
+            </section>
           </div>
         </section>
         <aside class="globe-card" aria-hidden="true">
@@ -1277,12 +1316,16 @@
       </div>
     </section>
   </main>
+  <div id="saveNotice" class="save-notice" role="status" aria-live="polite">已保存</div>
 
   <script src="https://furulei.github.io/cf/vendor/qrcode.min.js"></script>
   <script>
     const injected = window.IP168_BOOTSTRAP;
     const app = document.getElementById("app");
     const statusEl = document.getElementById("status");
+    const saveNoticeEl = document.getElementById("saveNotice");
+    let saveNoticeActive = false;
+    let saveNoticeTimer = 0;
 
     if (!injected) {
       document.body.classList.add("missing-entry");
@@ -1364,6 +1407,18 @@
     function setStatus(text, type) {
       statusEl.textContent = text || "";
       statusEl.className = "status subscription-status" + (type ? " " + type : "");
+    }
+
+    function showSaveNotice(text = "已保存") {
+      if (saveNoticeActive) return;
+      saveNoticeActive = true;
+      saveNoticeEl.textContent = text;
+      saveNoticeEl.classList.add("active");
+      window.clearTimeout(saveNoticeTimer);
+      saveNoticeTimer = window.setTimeout(() => {
+        saveNoticeEl.classList.remove("active");
+        saveNoticeActive = false;
+      }, 1600);
     }
 
     function escapeHtml(value) {
@@ -1622,6 +1677,57 @@
       setStatus("配置已保存。", "ok");
     }
 
+    async function saveEntry() {
+      setStatus("正在保存入口...");
+      const config = clone(state.config);
+      const data = await postJson(bootstrap.endpoints.save, {
+        config,
+        addText: fields.addText.value
+      });
+      state.config = data.config || config;
+      state.addText = data.addText ?? fields.addText.value;
+      fields.addText.value = state.addText;
+      setStatus("入口已保存。", "ok");
+      showSaveNotice("入口已保存");
+    }
+
+    function readProxyConfigFromForm() {
+      const config = clone(state.config);
+      const proxy = { ...(config[PROXY_KEY] || {}) };
+      proxy.Mode = "proxy-only";
+      proxy.PROXYIP = cleanProxyipText(fields.proxyip.value);
+      fields.proxyip.value = displayProxyipText(proxy.PROXYIP);
+      fields.proxyCount.value = countList(proxy.PROXYIP);
+      config[PROXY_KEY] = proxy;
+      return config;
+    }
+
+    async function saveProxyip() {
+      setStatus("正在保存出口...");
+      fields.autoEnabled.checked = fields.proxyMode.value === "auto";
+      const config = readProxyConfigFromForm();
+      const autoSettings = readAutoSettings();
+      const [data, autoData] = await Promise.all([
+        postJson(bootstrap.endpoints.save, {
+          config,
+          addText: state.addText || ""
+        }),
+        postJson(bootstrap.endpoints.proxyAuto, autoSettings)
+      ]);
+      state.config = data.config || config;
+      state.addText = data.addText ?? state.addText ?? "";
+      state.currentProxyip = state.config?.[PROXY_KEY]?.PROXYIP || state.currentProxyip || "";
+      state.auto = {
+        settings: autoData.settings || autoSettings,
+        state: autoData.state || state.auto?.state || {}
+      };
+      fillForm(state.config, state.addText);
+      fillAutoForm(state.auto.settings);
+      renderAutoState(state.auto.state, state.currentProxyip);
+      setStatus("出口已保存。", "ok");
+      showSaveNotice("出口已保存");
+    }
+
     async function refreshEntries() {
       const data = await api(bootstrap.endpoints.entries);
       state.addText = data.addText || "";
@@ -1856,7 +1962,7 @@
       fields.autoEnabled.checked = false;
       fields.proxyip.value = displayProxyipText(finalProxyip);
       fields.proxyCount.value = countList(fields.proxyip.value);
-      await saveAll();
+      await saveProxyip();
       setStatus("已写入 " + count + " 条 PROXYIP。", "ok");
     }
 
@@ -1994,7 +2100,8 @@
         });
       });
       document.getElementById("saveConfig").addEventListener("click", () => saveAll().catch(showError));
-      document.getElementById("saveAll").addEventListener("click", () => saveAll().catch(showError));
+      document.getElementById("saveEntry").addEventListener("click", () => saveEntry().catch(showError));
+      document.getElementById("saveProxyip").addEventListener("click", () => saveProxyip().catch(showError));
       document.getElementById("saveSubName").addEventListener("click", () => saveAll().catch(showError));
       document.getElementById("reloadState").addEventListener("click", () => loadState().catch(showError));
       document.getElementById("logoutButton").addEventListener("click", () => logout().catch(showError));
