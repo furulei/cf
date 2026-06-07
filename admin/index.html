@@ -1134,6 +1134,18 @@
     const SUB_KEY = "\u4f18\u9009\u8ba2\u9605\u751f\u6210";
     const DEFAULT_SUB_NAME = "\u5f52\u6765\u662f\u5c11\u5e74";
     const bootstrap = injected;
+    const apiBase = bootstrap.apiBase || ((bootstrap.adminBase || "").replace(/\/+$/, "") + "/api");
+    bootstrap.apiBase = apiBase;
+    bootstrap.endpoints = {
+      state: apiBase + "/state",
+      save: apiBase + "/save",
+      entries: apiBase + "/entries",
+      proxyTest: apiBase + "/proxy/test",
+      proxyAuto: apiBase + "/proxy/auto",
+      proxyRun: apiBase + "/proxy/run",
+      logout: apiBase + "/logout",
+      ...(bootstrap.endpoints || {})
+    };
     const state = {
       config: null,
       addText: "",
