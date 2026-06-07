@@ -2129,7 +2129,7 @@
     }
 
     function catalogCountryList(summary, version) {
-      const type = String(version) === "6" ? "ipv6" : "ipv4";
+      const type = String(version).toLowerCase() === "all" ? "all" : (String(version) === "6" ? "ipv6" : "ipv4");
       if (Array.isArray(summary?.countries)) {
         return summary.countries;
       }
@@ -2169,7 +2169,7 @@
     async function loadSummary() {
       state.catalogSummary = await catalogJson(bootstrap.catalog.summaryUrl);
       applyCatalogSummary(state.proxyIpVersion);
-      fillAutoCountryOptions(catalogCountryList(state.catalogSummary, state.autoIpVersion));
+      fillAutoCountryOptions(catalogCountryList(state.catalogSummary, "all"));
       fillAutoPortOptions(catalogPortList(state.catalogSummary, state.autoIpVersion));
       renderAutoPicker();
     }
@@ -2199,7 +2199,7 @@
         .filter((item) => item.code);
     }
 
-    function autoCountryMap(version = state.autoIpVersion) {
+    function autoCountryMap(version = "all") {
       const map = new Map();
       normalizedCatalogCountries(catalogCountryList(state.catalogSummary || {}, version)).forEach((item) => {
         map.set(item.code, item.count);
@@ -2208,7 +2208,7 @@
     }
 
     function autoCountriesForRegion(region = state.autoRegion) {
-      const counts = autoCountryMap(state.autoIpVersion);
+      const counts = autoCountryMap("all");
       return (AUTO_REGION_COUNTRIES[region] || [])
         .map((code) => ({ code, count: counts.get(code) || 0 }))
         .filter((item) => item.count > 0)
@@ -2261,7 +2261,7 @@
     function setAutoIpVersion(version) {
       state.autoIpVersion = String(version) === "6" ? "6" : "4";
       selectAutoCountry("");
-      fillAutoCountryOptions(catalogCountryList(state.catalogSummary || {}, state.autoIpVersion));
+      fillAutoCountryOptions(catalogCountryList(state.catalogSummary || {}, "all"));
       fillAutoPortOptions(catalogPortList(state.catalogSummary || {}, state.autoIpVersion));
       renderAutoPicker();
     }
