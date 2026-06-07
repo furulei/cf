@@ -911,7 +911,7 @@
       border-radius: 4px;
       background: var(--panel-soft);
       color: var(--muted);
-      font-size: 11px;
+      font-size: 13px;
       line-height: 1.45;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
@@ -921,6 +921,7 @@
       display: grid;
       align-content: start;
       gap: 14px;
+      width: min(560px, 100%);
     }
     .auto-status-layout {
       grid-template-columns: 1fr;
@@ -934,7 +935,7 @@
       min-height: 88px;
     }
     .auto-visible-settings {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 18px;
       align-items: end;
       margin-top: 0;
@@ -1284,19 +1285,19 @@
             </div>
           </div>
           <div class="grid auto-visible-settings">
-            <label>国家
-              <select id="autoCountry">
-                <option value="US">美国</option>
-              </select>
-            </label>
-            <label>端口
+            <button id="runAuto" class="secondary" type="button">&#x7acb;&#x5373;&#x8fd0;&#x884c;</button>
+            <label>&#x7aef;&#x53e3;
               <select id="autoPort">
                 <option value="443">443</option>
               </select>
             </label>
-            <button id="runAuto" class="secondary" type="button">立即运行</button>
           </div>
           <div class="auto-hidden-settings" hidden>
+            <label>&#x56fd;&#x5bb6;
+              <select id="autoCountry">
+                <option value="US">&#x7f8e;&#x56fd;</option>
+              </select>
+            </label>
             <label class="check">
               <input id="autoEnabled" type="checkbox">
               启用自动维护
