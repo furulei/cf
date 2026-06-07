@@ -2046,13 +2046,13 @@
 
     async function loadCandidates() {
       if (catalogNodesUrl(state.proxyIpVersion)) {
-        setStatus("姝ｅ湪鑾峰彇鍊欓€?..");
+        setStatus("Loading candidates...");
         const data = await loadCatalogFileCandidates();
         state.nodes = Array.isArray(data.nodes) ? data.nodes : [];
         state.probe.clear();
         state.selected = new Set(filteredProxyNodes().map(endpointOf).filter(Boolean));
         renderCandidates();
-        setStatus("鍊欓€夊凡鑾峰彇銆?, "ok");
+        setStatus("Candidates loaded.", "ok");
         return;
       }
       const url = new URL(bootstrap.catalog.queryUrl, bootstrap.workerOrigin);
