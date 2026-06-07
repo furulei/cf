@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "type": "ipv6",
+  "port": 443,
+  "updatedAt": "2026-06-07T21:29:10.059Z",
+  "source": {
+    "name": "YOYO proxy catalog",
+    "url": "https://zip.cm.edu.kg/all.json",
+    "generatedAt": "2026-06-07T03:45:32.166232"
+  },
+  "total": 0,
+  "countries": {},
+  "nodes": []
+}
