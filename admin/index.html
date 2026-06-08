@@ -1526,10 +1526,6 @@
               <input id="standbyGroupSize" type="number" min="1" max="5">
             </label>
           </div>
-          <div class="actions auto-actions">
-            <button id="saveAuto" type="button" hidden>保存自动维护</button>
-            <button id="forceReplace" class="warn" type="button" hidden>强制换一组</button>
-          </div>
         </section>
         <section class="auto-country-panel" aria-label="&#x81ea;&#x52a8;&#x7ef4;&#x62a4;&#x56fd;&#x5bb6;&#x9009;&#x62e9;">
           <div class="auto-picker-row">
@@ -1542,7 +1538,6 @@
             <button class="auto-ip-tab active" type="button" data-auto-ip-version="4">IPv4</button>
             <button class="auto-ip-tab" type="button" data-auto-ip-version="6">IPv6</button>
           </div>
-          <div id="autoRegionButtons" hidden></div>
           <div id="autoCountryButtons" class="auto-country-buttons"></div>
           <div id="autoCountryHint" class="auto-country-hint">&#x8bf7;&#x9009;&#x62e9;&#x56fd;&#x5bb6;&#x540e;&#x70b9;&#x51fb;&#x7acb;&#x5373;&#x8fd0;&#x884c;&#x3002;</div>
         </section>
@@ -2868,18 +2863,8 @@
       document.getElementById("currentProxyip").textContent = currentProxyip || state.currentProxyip || "暂无";
     }
 
-    async function saveAuto() {
-      setStatus("正在保存自动维护设置...");
-      const data = await postJson(bootstrap.endpoints.proxyAuto, readAutoSettings());
-      state.auto = { settings: data.settings || {}, state: data.state || {} };
-      fillAutoForm(state.auto.settings);
-      renderAutoState(state.auto.state, "");
-      setStatus("自动维护设置已保存。", "ok");
-    }
-
-    async function runAuto(forceReplace) {
+    async function runAuto() {
       if (!requireAutoCountrySelection()) return;
-      void forceReplace;
       await openAutoRunDialog();
     }
 
@@ -2961,9 +2946,7 @@
         selectAutoCountry(button.dataset.autoCountry || "");
       });
       document.getElementById("customProxyip").addEventListener("input", renderCandidates);
-      document.getElementById("saveAuto").addEventListener("click", () => saveAuto().catch(showError));
-      document.getElementById("runAuto").addEventListener("click", () => runAuto(false).catch(showError));
-      document.getElementById("forceReplace").addEventListener("click", () => runAuto(true).catch(showError));
+      document.getElementById("runAuto").addEventListener("click", () => runAuto().catch(showError));
       fields.autoRunRows.addEventListener("change", (event) => {
         const proxy = event.target?.dataset?.autoRunPick;
         if (!proxy) return;
