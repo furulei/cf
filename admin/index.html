@@ -1018,6 +1018,111 @@
       font-size: 14px;
       line-height: 1.45;
     }
+    .auto-run-dialog[hidden] {
+      display: none;
+    }
+    .auto-run-dialog {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .auto-run-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(11, 11, 16, 0.62);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .auto-run-panel {
+      position: relative;
+      z-index: 1;
+      width: min(920px, calc(100vw - 32px));
+      max-height: min(760px, calc(100vh - 48px));
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      gap: 12px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background:
+        linear-gradient(116deg, rgba(66, 49, 51, 0.96), rgba(31, 31, 39, 0.97)),
+        var(--panel-soft);
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+    }
+    .auto-run-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+    }
+    .auto-run-head h2 {
+      margin-bottom: 6px;
+      font-size: 20px;
+    }
+    .auto-run-subtitle,
+    .auto-run-progress {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .auto-run-progress {
+      min-height: 22px;
+    }
+    .auto-run-table-wrap {
+      min-height: 260px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.025);
+    }
+    .auto-run-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .auto-run-table th,
+    .auto-run-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+      text-align: left;
+      vertical-align: middle;
+    }
+    .auto-run-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: rgba(33, 31, 38, 0.96);
+      color: rgba(255, 255, 255, 0.82);
+      font-weight: 760;
+    }
+    .auto-run-table td:first-child,
+    .auto-run-table th:first-child {
+      width: 64px;
+      text-align: center;
+    }
+    .auto-run-table input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #fff;
+    }
+    .auto-run-row-ok {
+      color: #fff;
+    }
+    .auto-run-row-bad {
+      color: rgba(255, 209, 209, 0.82);
+    }
+    .auto-run-actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+    .auto-run-actions button {
+      width: 100%;
+      min-height: 52px;
+    }
     .direct-open {
       max-width: 760px;
       margin: 18vh auto 0;
@@ -1444,6 +1549,39 @@
       </div>
     </section>
   </main>
+  <div id="autoRunDialog" class="auto-run-dialog" hidden>
+    <div class="auto-run-backdrop" data-auto-run-close></div>
+    <section class="auto-run-panel" role="dialog" aria-modal="true" aria-labelledby="autoRunTitle">
+      <div class="auto-run-head">
+        <div>
+          <h2 id="autoRunTitle">&#x9009;&#x62e9;&#x843d;&#x5730;IP</h2>
+          <div id="autoRunSubtitle" class="auto-run-subtitle"></div>
+        </div>
+        <button id="autoRunClose" class="ghost" type="button">&#x5173;&#x95ed;</button>
+      </div>
+      <div id="autoRunProgress" class="auto-run-progress" role="status" aria-live="polite"></div>
+      <div class="auto-run-table-wrap">
+        <table class="auto-run-table">
+          <thead>
+            <tr>
+              <th>&#x9009;</th>
+              <th>IP&#x5730;&#x5740;:&#x7aef;&#x53e3;</th>
+              <th>&#x51fa;&#x53e3;</th>
+              <th>&#x5730;&#x533a;</th>
+              <th>&#x5ef6;&#x8fdf;</th>
+            </tr>
+          </thead>
+          <tbody id="autoRunRows">
+            <tr><td colspan="5" class="hint">&#x8bf7;&#x5148;&#x9009;&#x62e9;&#x56fd;&#x5bb6;&#x3002;</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="auto-run-actions">
+        <button id="autoRunImport" class="warn" type="button" disabled>&#x5bfc;&#x5165; 9 &#x4e2a;IP</button>
+        <button id="autoRunCancel" class="ghost" type="button">&#x53d6;&#x6d88;</button>
+      </div>
+    </section>
+  </div>
   <div id="saveNotice" class="save-notice" role="status" aria-live="polite">已保存</div>
 
   <script src="https://furulei.github.io/cf/vendor/qrcode.min.js"></script>
@@ -1455,6 +1593,10 @@
     let saveNoticeActive = false;
     let saveNoticeTimer = 0;
     let proxyipManualDraft = "";
+    const AUTO_RUN_CANDIDATE_LIMIT = 500;
+    const AUTO_RUN_IMPORT_LIMIT = 9;
+    const AUTO_RUN_TEST_BATCH_SIZE = 20;
+    const AUTO_RUN_TEST_CONCURRENCY = 4;
 
     if (!injected) {
       document.body.classList.add("missing-entry");
@@ -1491,6 +1633,16 @@
       autoIpVersion: "4",
       autoRegion: "亚洲",
       autoSelectedCountry: "",
+      autoRun: {
+        candidates: [],
+        selected: new Set(),
+        results: new Map(),
+        settings: null,
+        testing: false,
+        cancel: false,
+        tested: 0,
+        ok: 0
+      },
       catalogSummary: null,
       links: {},
       qrUrl: ""
@@ -1527,7 +1679,14 @@
       autoConcurrency: document.getElementById("autoConcurrency"),
       autoHealCooldownMinutes: document.getElementById("autoHealCooldownMinutes"),
       standbyGroupCount: document.getElementById("standbyGroupCount"),
-      standbyGroupSize: document.getElementById("standbyGroupSize")
+      standbyGroupSize: document.getElementById("standbyGroupSize"),
+      autoRunDialog: document.getElementById("autoRunDialog"),
+      autoRunSubtitle: document.getElementById("autoRunSubtitle"),
+      autoRunProgress: document.getElementById("autoRunProgress"),
+      autoRunRows: document.getElementById("autoRunRows"),
+      autoRunImport: document.getElementById("autoRunImport"),
+      autoRunCancel: document.getElementById("autoRunCancel"),
+      autoRunClose: document.getElementById("autoRunClose")
     };
 
     const AUTO_COUNTRY_LABELS = {
@@ -2438,6 +2597,199 @@
       setStatus("已写入 " + count + " 条 PROXYIP。", "ok");
     }
 
+    function resetAutoRunState(settings) {
+      state.autoRun = {
+        candidates: [],
+        selected: new Set(),
+        results: new Map(),
+        settings,
+        testing: false,
+        cancel: false,
+        tested: 0,
+        ok: 0
+      };
+    }
+
+    function autoRunEndpointResult(proxy) {
+      return state.autoRun.results.get(proxy);
+    }
+
+    function autoRunDelayText(result) {
+      if (!result) return state.autoRun.testing ? "\u6392\u961f\u4e2d" : "\u672a\u6d4b\u901f";
+      if (result.testing) return "\u6d4b\u901f\u4e2d";
+      if (!result.ok) return result.error ? "\u4e0d\u53ef\u7528" : "\u5931\u8d25";
+      const value = result.compatMs ?? result.connectMs ?? result.delayMs ?? result.latencyMs ?? result.latency;
+      return Number.isFinite(Number(value)) ? Math.round(Number(value)) + "ms" : "\u53ef\u7528";
+    }
+
+    function updateAutoRunTotals() {
+      const completed = Array.from(state.autoRun.results.values()).filter((item) => item && !item.testing);
+      state.autoRun.tested = completed.length;
+      state.autoRun.ok = completed.filter((item) => item.ok).length;
+    }
+
+    async function loadAutoRunCandidates(settings) {
+      const url = catalogNodesUrl(settings.ipVersion);
+      if (!url) throw new Error("\u7f3a\u5c11 IP \u4ed3\u5e93\u5730\u5740");
+      const data = await catalogJson(url);
+      const country = String(settings.country || "").trim().toUpperCase();
+      const port = String(settings.port || "443").trim();
+      return (Array.isArray(data.nodes) ? data.nodes : []).filter((node) => {
+        if (country && String(node.country || "").trim().toUpperCase() !== country) return false;
+        if (port && String(node.port || "").trim() !== port) return false;
+        return catalogStatusMatches(node, settings.status);
+      }).slice(0, AUTO_RUN_CANDIDATE_LIMIT);
+    }
+
+    function renderAutoRunDialog() {
+      const settings = state.autoRun.settings || readAutoSettings();
+      const candidates = state.autoRun.candidates || [];
+      const selectedCount = state.autoRun.selected.size;
+      updateAutoRunTotals();
+      fields.autoRunSubtitle.textContent = autoCountryLabel(settings.country) + " / IPv" + settings.ipVersion + " / " + (settings.port || "443") + " / \u524d " + AUTO_RUN_CANDIDATE_LIMIT + " \u4e2a\u5019\u9009";
+      fields.autoRunProgress.textContent = "\u5019\u9009 " + candidates.length + " \u6761\uff0c\u5df2\u6d4b\u901f " + state.autoRun.tested + " / " + candidates.length + "\uff0c\u53ef\u7528 " + state.autoRun.ok + "\uff0c\u5df2\u9009 " + selectedCount + " / " + AUTO_RUN_IMPORT_LIMIT + "\u3002";
+      fields.autoRunImport.disabled = !(selectedCount || state.autoRun.ok);
+      fields.autoRunImport.textContent = "\u5bfc\u5165\uff08\u5df2\u9009 " + selectedCount + " / \u6700\u591a " + AUTO_RUN_IMPORT_LIMIT + "\uff09";
+      if (!candidates.length) {
+        fields.autoRunRows.innerHTML = '<tr><td colspan="5" class="hint">\u5f53\u524d\u56fd\u5bb6\u6ca1\u6709\u53ef\u5bfc\u5165\u7684\u5019\u9009 IP\u3002</td></tr>';
+        return;
+      }
+      fields.autoRunRows.innerHTML = candidates.map((node) => {
+        const proxy = endpointOf(node);
+        const result = autoRunEndpointResult(proxy);
+        const checked = state.autoRun.selected.has(proxy) ? " checked" : "";
+        const disabled = (!checked && selectedCount >= AUTO_RUN_IMPORT_LIMIT) ? " disabled" : "";
+        const rowClass = result?.ok ? "auto-run-row-ok" : (result && !result.testing ? "auto-run-row-bad" : "");
+        const exit = autoCountryLabel(node.loc || node.country || "");
+        const region = [node.city, node.asn || node.org].filter(Boolean).join(" / ");
+        return `
+          <tr class="${rowClass}">
+            <td><input type="checkbox" data-auto-run-pick="${escapeHtml(proxy)}"${checked}${disabled}></td>
+            <td class="mono">${escapeHtml(proxy)}</td>
+            <td>${escapeHtml(exit || "-")}</td>
+            <td>${escapeHtml(region || "-")}</td>
+            <td>${escapeHtml(autoRunDelayText(result))}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function openAutoRunDialog() {
+      const settings = readAutoSettings();
+      resetAutoRunState(settings);
+      fields.autoRunDialog.hidden = false;
+      fields.autoRunProgress.textContent = "\u6b63\u5728\u8bfb\u53d6\u524d " + AUTO_RUN_CANDIDATE_LIMIT + " \u4e2a\u5019\u9009...";
+      fields.autoRunRows.innerHTML = '<tr><td colspan="5" class="hint">\u5019\u9009\u8bfb\u53d6\u4e2d...</td></tr>';
+      setStatus("\u6b63\u5728\u6253\u5f00\u5019\u9009 IP \u6d4b\u901f\u961f\u5217...");
+      state.autoRun.candidates = await loadAutoRunCandidates(settings);
+      renderAutoRunDialog();
+      const targets = state.autoRun.candidates.map(endpointOf).filter(Boolean);
+      if (!targets.length) {
+        setStatus("\u5f53\u524d\u56fd\u5bb6\u6ca1\u6709\u5019\u9009 IP\u3002", "error");
+        return;
+      }
+      queueAutoRunSpeedTests(targets).catch(showError);
+    }
+
+    async function queueAutoRunSpeedTests(targets) {
+      state.autoRun.testing = true;
+      state.autoRun.cancel = false;
+      renderAutoRunDialog();
+      for (let index = 0; index < targets.length; index += AUTO_RUN_TEST_BATCH_SIZE) {
+        if (state.autoRun.cancel) break;
+        const chunk = targets.slice(index, index + AUTO_RUN_TEST_BATCH_SIZE);
+        chunk.forEach((proxy) => state.autoRun.results.set(proxy, { proxy, testing: true, ok: false }));
+        renderAutoRunDialog();
+        let data;
+        try {
+          data = await postJson(bootstrap.endpoints.proxyTest, {
+            targets: chunk,
+            timeoutMs: normalizedNumber(fields.autoTimeoutMs, 8000, 1000, 8000),
+            concurrency: AUTO_RUN_TEST_CONCURRENCY
+          });
+        } catch (error) {
+          chunk.forEach((proxy) => state.autoRun.results.set(proxy, {
+            proxy,
+            ok: false,
+            error: error.message || String(error)
+          }));
+          renderAutoRunDialog();
+          continue;
+        }
+        const returned = new Set();
+        (data.results || []).forEach((item) => {
+          returned.add(item.proxy);
+          state.autoRun.results.set(item.proxy, item);
+        });
+        chunk.forEach((proxy) => {
+          if (!returned.has(proxy)) {
+            state.autoRun.results.set(proxy, { proxy, ok: false, error: "\u65e0\u7ed3\u679c" });
+          }
+        });
+        renderAutoRunDialog();
+      }
+      state.autoRun.testing = false;
+      renderAutoRunDialog();
+    }
+
+    function toggleAutoRunPick(proxy, checked) {
+      if (!proxy) return;
+      if (checked) {
+        if (state.autoRun.selected.size >= AUTO_RUN_IMPORT_LIMIT) {
+          renderAutoRunDialog();
+          return;
+        }
+        state.autoRun.selected.add(proxy);
+      } else {
+        state.autoRun.selected.delete(proxy);
+      }
+      renderAutoRunDialog();
+    }
+
+    function selectedAutoRunEndpoints() {
+      return state.autoRun.candidates
+        .map(endpointOf)
+        .filter((proxy) => proxy && state.autoRun.selected.has(proxy))
+        .slice(0, AUTO_RUN_IMPORT_LIMIT);
+    }
+
+    function autoRunFillToNine() {
+      const selected = selectedAutoRunEndpoints();
+      const used = new Set(selected);
+      for (const node of state.autoRun.candidates) {
+        if (selected.length >= AUTO_RUN_IMPORT_LIMIT) break;
+        const proxy = endpointOf(node);
+        const result = autoRunEndpointResult(proxy);
+        if (selected.length < AUTO_RUN_IMPORT_LIMIT && proxy && !used.has(proxy) && result?.ok) {
+          selected.push(proxy);
+          used.add(proxy);
+        }
+      }
+      return selected;
+    }
+
+    async function autoRunImportSelected() {
+      const finalProxyip = autoRunFillToNine();
+      if (!finalProxyip.length) {
+        fields.autoRunProgress.textContent = "\u6682\u65e0\u53ef\u5bfc\u5165 IP\uff0c\u8bf7\u7b49\u5f85\u6d4b\u901f\u7ed3\u679c\u3002";
+        return;
+      }
+      fields.proxyMode.value = "manual";
+      fields.autoEnabled.checked = false;
+      fields.proxyip.value = displayProxyipText(finalProxyip.join(","));
+      fields.proxyCount.value = countList(fields.proxyip.value);
+      syncProxyModeView();
+      await saveProxyip();
+      closeAutoRunDialog();
+      setStatus("\u5df2\u5bfc\u5165 " + finalProxyip.length + " \u4e2a IP\u3002", "ok");
+    }
+
+    function closeAutoRunDialog() {
+      state.autoRun.cancel = true;
+      state.autoRun.testing = false;
+      fields.autoRunDialog.hidden = true;
+    }
+
     function fillAutoForm(settings) {
       fields.autoEnabled.checked = settings.enabled !== false;
       fields.proxyMode.value = fields.autoEnabled.checked ? "auto" : "manual";
@@ -2527,25 +2879,8 @@
 
     async function runAuto(forceReplace) {
       if (!requireAutoCountrySelection()) return;
-      setStatus(forceReplace ? "正在保存并强制换一组..." : "正在保存并运行自动维护...");
-      fields.autoEnabled.checked = true;
-      fields.proxyMode.value = "auto";
-      const autoData = await postJson(bootstrap.endpoints.proxyAuto, readAutoSettings());
-      const data = await postJson(bootstrap.endpoints.proxyRun, {
-        forceEnabled: true,
-        forceReplace: true
-      });
-      if (data.config) {
-        state.config = data.config;
-        fillForm(state.config, state.addText);
-      }
-      state.auto = {
-        settings: autoData.settings || readAutoSettings(),
-        state: data.state || autoData.state || state.auto?.state || {}
-      };
-      fillAutoForm(state.auto.settings);
-      renderAutoState(state.auto.state || {}, data.currentProxyip || "");
-      setStatus("自动维护运行完成。", "ok");
+      void forceReplace;
+      await openAutoRunDialog();
     }
 
     function logoutEndpoint() {
@@ -2629,6 +2964,24 @@
       document.getElementById("saveAuto").addEventListener("click", () => saveAuto().catch(showError));
       document.getElementById("runAuto").addEventListener("click", () => runAuto(false).catch(showError));
       document.getElementById("forceReplace").addEventListener("click", () => runAuto(true).catch(showError));
+      fields.autoRunRows.addEventListener("change", (event) => {
+        const proxy = event.target?.dataset?.autoRunPick;
+        if (!proxy) return;
+        toggleAutoRunPick(proxy, event.target.checked);
+      });
+      fields.autoRunImport.addEventListener("click", () => autoRunImportSelected().catch(showError));
+      fields.autoRunCancel.addEventListener("click", closeAutoRunDialog);
+      fields.autoRunClose.addEventListener("click", closeAutoRunDialog);
+      fields.autoRunDialog.addEventListener("click", (event) => {
+        if (event.target?.dataset?.autoRunClose !== undefined) {
+          closeAutoRunDialog();
+        }
+      });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !fields.autoRunDialog.hidden) {
+          closeAutoRunDialog();
+        }
+      });
       fields.proxyMode.addEventListener("change", () => {
         fields.autoEnabled.checked = fields.proxyMode.value === "auto";
         syncProxyModeView();
