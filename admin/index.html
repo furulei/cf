@@ -1455,6 +1455,7 @@
             <button id="runAuto" class="secondary" type="button">&#x7acb;&#x5373;&#x8fd0;&#x884c;</button>
             <label>&#x7aef;&#x53e3;
               <select id="autoPort">
+                <option value="">&#x5168;&#x90e8;&#x7aef;&#x53e3;</option>
                 <option value="443">443</option>
               </select>
             </label>
@@ -2472,10 +2473,10 @@
 
     function fillAutoPortOptions(ports) {
       const topPorts = topCatalogPorts(ports);
-      const current = String(state.auto?.settings?.port || fields.autoPort.value || "443").trim();
-      const options = topPorts.length ? topPorts : [{ port: current || "443", count: 0 }];
-      fields.autoPort.innerHTML = options.map((item) => `<option value="${escapeHtml(item.port)}">${escapeHtml(item.port)}</option>`).join("");
-      fields.autoPort.value = options.some((item) => item.port === current) ? current : options[0].port;
+      const current = String(state.auto?.settings?.port || fields.autoPort.value || "").trim();
+      const options = [{ port: "", label: "全部端口" }].concat(topPorts.length ? topPorts : [{ port: "443", count: 0 }]);
+      fields.autoPort.innerHTML = options.map((item) => `<option value="${escapeHtml(item.port)}">${escapeHtml(item.label || item.port)}</option>`).join("");
+      fields.autoPort.value = options.some((item) => item.port === current) ? current : "";
     }
 
     function catalogNodesUrl(version) {
@@ -2590,7 +2591,7 @@
       if (!result) return state.autoRun.testing ? "\u6392\u961f\u4e2d" : "\u672a\u6d4b\u901f";
       if (result.testing) return "\u6d4b\u901f\u4e2d";
       if (!result.ok) return result.error ? "\u4e0d\u53ef\u7528" : "\u5931\u8d25";
-      const value = result.compatMs ?? result.connectMs ?? result.delayMs ?? result.latencyMs ?? result.latency;
+      const value = result.traceMs ?? result.connectMs ?? result.delayMs ?? result.latencyMs ?? result.latency;
       return Number.isFinite(Number(value)) ? Math.round(Number(value)) + "ms" : "\u53ef\u7528";
     }
 
@@ -2605,7 +2606,7 @@
       if (!url) throw new Error("\u7f3a\u5c11 IP \u4ed3\u5e93\u5730\u5740");
       const data = await catalogJson(url);
       const country = String(settings.country || "").trim().toUpperCase();
-      const port = String(settings.port || "443").trim();
+      const port = String(settings.port || "").trim();
       return (Array.isArray(data.nodes) ? data.nodes : []).filter((node) => {
         if (country && String(node.country || "").trim().toUpperCase() !== country) return false;
         if (port && String(node.port || "").trim() !== port) return false;
@@ -2618,7 +2619,7 @@
       const candidates = state.autoRun.candidates || [];
       const selectedCount = state.autoRun.selected.size;
       updateAutoRunTotals();
-      fields.autoRunSubtitle.textContent = autoCountryLabel(settings.country) + " / IPv" + settings.ipVersion + " / " + (settings.port || "443") + " / \u524d " + AUTO_RUN_CANDIDATE_LIMIT + " \u4e2a\u5019\u9009";
+      fields.autoRunSubtitle.textContent = autoCountryLabel(settings.country) + " / IPv" + settings.ipVersion + " / " + (settings.port || "全部端口") + " / \u524d " + AUTO_RUN_CANDIDATE_LIMIT + " \u4e2a\u5019\u9009";
       fields.autoRunProgress.textContent = "\u5019\u9009 " + candidates.length + " \u6761\uff0c\u5df2\u6d4b\u901f " + state.autoRun.tested + " / " + candidates.length + "\uff0c\u53ef\u7528 " + state.autoRun.ok + "\uff0c\u5df2\u9009 " + selectedCount + " / " + AUTO_RUN_IMPORT_LIMIT + "\u3002";
       fields.autoRunImport.disabled = !(selectedCount || state.autoRun.ok);
       fields.autoRunImport.textContent = "\u5bfc\u5165\uff08\u5df2\u9009 " + selectedCount + " / \u6700\u591a " + AUTO_RUN_IMPORT_LIMIT + "\uff09";
@@ -2770,7 +2771,7 @@
       fields.autoHealOnAllFailed.checked = settings.autoHealOnAllFailed !== false;
       state.autoSelectedCountry = "";
       fields.autoCountry.value = "";
-      fields.autoPort.value = settings.port || "443";
+      fields.autoPort.value = settings.port || "";
       fields.autoStatus.value = settings.status || "verified,usable";
       fields.autoCandidateLimit.value = settings.candidateLimit ?? 50;
       fields.autoSaveCount.value = settings.saveCount ?? 3;
@@ -2792,7 +2793,7 @@
         autoHealOnAllFailed: fields.autoHealOnAllFailed.checked,
         ipVersion: state.autoIpVersion,
         country: fields.autoCountry.value.trim().toUpperCase(),
-        port: fields.autoPort.value.trim() || "443",
+        port: fields.autoPort.value.trim(),
         status: fields.autoStatus.value,
         candidateLimit: normalizedNumber(fields.autoCandidateLimit, 50, 1, 50),
         saveCount: normalizedNumber(fields.autoSaveCount, 3, 1, 10),
