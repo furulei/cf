@@ -2794,6 +2794,7 @@
         ipVersion: state.autoIpVersion,
         country: fields.autoCountry.value.trim().toUpperCase(),
         port: fields.autoPort.value.trim(),
+        portMode: fields.autoPort.value.trim() ? "explicit" : "all",
         status: fields.autoStatus.value,
         candidateLimit: normalizedNumber(fields.autoCandidateLimit, 50, 1, 50),
         saveCount: normalizedNumber(fields.autoSaveCount, 3, 1, 10),
