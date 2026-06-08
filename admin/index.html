@@ -1298,18 +1298,6 @@
               <input id="token" class="mono" spellcheck="false" autocomplete="off">
             </label>
           </div>
-          <label class="check" style="margin-top:12px">
-            <input id="echEnabled" type="checkbox">
-            启用 ECH 订阅参数
-          </label>
-          <div class="grid">
-            <label>ECH DNS
-              <input id="echDns" spellcheck="false" autocomplete="off">
-            </label>
-            <label>ECH SNI
-              <input id="echSni" spellcheck="false" autocomplete="off">
-            </label>
-          </div>
           <div class="actions">
             <button id="saveConfig" type="button">保存配置</button>
             <button id="reloadState" class="secondary" type="button">重新读取</button>
@@ -1649,9 +1637,6 @@
       token: document.getElementById("token"),
       subName: document.getElementById("subName"),
       fingerprint: document.getElementById("fingerprint"),
-      echEnabled: document.getElementById("echEnabled"),
-      echDns: document.getElementById("echDns"),
-      echSni: document.getElementById("echSni"),
       addText: document.getElementById("addText"),
       proxyMode: document.getElementById("proxyMode"),
       proxyip: document.getElementById("proxyip"),
@@ -1961,15 +1946,11 @@
     function fillForm(config, addText) {
       const proxy = config[PROXY_KEY] || {};
       const sub = config[SUB_KEY] || {};
-      const ech = config.ECHConfig || {};
       fields.host.value = config.HOST || "";
       fields.uuid.value = config.UUID || "";
       fields.token.value = sub.TOKEN || "";
       fields.subName.value = sub.SUBNAME || DEFAULT_SUB_NAME;
       fields.fingerprint.value = config.Fingerprint || "chrome";
-      fields.echEnabled.checked = Boolean(config.ECH);
-      fields.echDns.value = ech.DNS || "";
-      fields.echSni.value = ech.SNI || "";
       fields.addText.value = addText || "";
       fields.proxyMode.value = fields.autoEnabled?.checked ? "auto" : "manual";
       proxyipManualDraft = displayProxyipText(proxy.PROXYIP || "");
@@ -1986,12 +1967,8 @@
       config.HOSTS = config.HOST ? [config.HOST] : [];
       config.UUID = fields.uuid.value.trim();
       config.Fingerprint = fields.fingerprint.value;
-      config.ECH = fields.echEnabled.checked;
-      config.ECHConfig = {
-        ...(config.ECHConfig || {}),
-        DNS: fields.echDns.value.trim(),
-        SNI: fields.echSni.value.trim()
-      };
+      delete config.ECH;
+      delete config.ECHConfig;
       proxy.Mode = "proxy-only";
       if (fields.proxyMode.value === "manual") {
         proxy.PROXYIP = cleanProxyipText(fields.proxyip.value);
