@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
@@ -581,7 +581,7 @@
 
     async function duqu() {
       sheZhuangtai("读取中");
-      const data = await qingqiu("/guanli/api/zhuangtai");
+      const data = await qingqiu("/ck/api/zhuangtai");
       dangqianPeizhi = data.peizhi || {};
       yuan.rukou.value = data.rukou || "";
       tianPeizhi(dangqianPeizhi);
@@ -592,7 +592,7 @@
 
     async function denglu() {
       sheZhuangtai("登录中");
-      const data = await qingqiu("/guanli/api/denglu", {
+      const data = await qingqiu("/ck/api/denglu", {
         method: "POST",
         body: JSON.stringify({ mima: yuan.mima.value })
       });
@@ -603,7 +603,7 @@
 
     async function baocunPeizhi() {
       sheZhuangtai("保存配置中");
-      const data = await qingqiu("/guanli/api/baocun", {
+      const data = await qingqiu("/ck/api/baocun", {
         method: "POST",
         body: JSON.stringify({ peizhi: shoujiPeizhi() })
       });
@@ -614,7 +614,7 @@
 
     async function baocunRukou() {
       sheZhuangtai("保存入口中");
-      const data = await qingqiu("/guanli/api/rukou", {
+      const data = await qingqiu("/ck/api/rukou", {
         method: "POST",
         body: JSON.stringify({ rukou: yuan.rukou.value })
       });
@@ -632,7 +632,7 @@
 
     async function jiance() {
       sheZhuangtai("检测中");
-      const data = await qingqiu("/guanli/api/jiance", { method: "POST", body: "{}" });
+      const data = await qingqiu("/ck/api/jiance", { method: "POST", body: "{}" });
       xianshiJiance(data.zhuangtai || {});
       sheZhuangtai("检测完成", data.zhuangtai?.chenggong ? "hao" : "cuo");
     }
@@ -680,7 +680,7 @@
     }
 
     async function daochu() {
-      const data = await qingqiu("/guanli/api/daochu");
+      const data = await qingqiu("/ck/api/daochu");
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -699,7 +699,7 @@
       const file = yuan.daoruWenjian.files?.[0];
       if (!file) return;
       const backup = JSON.parse(await file.text());
-      const data = await qingqiu("/guanli/api/daoru", {
+      const data = await qingqiu("/ck/api/daoru", {
         method: "POST",
         body: JSON.stringify({ backup })
       });
@@ -709,7 +709,7 @@
 
     async function tuichu() {
       try {
-        await qingqiu("/guanli/api/tuichu", { method: "POST", body: "{}" });
+        await qingqiu("/ck/api/tuichu", { method: "POST", body: "{}" });
       } catch {
       }
       sheGuanliLingpai("");
