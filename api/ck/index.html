@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UUID 管理</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --di: #101418;
+      --mian: #151b21;
+      --xian: #2b3540;
+      --wen: #edf2f7;
+      --ci: #9aa7b4;
+      --lan: #5aa7ff;
+      --lv: #4fd2a0;
+      --hong: #ff6b6b;
+      --huang: #f2c94c;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--di);
+      color: var(--wen);
+      font: 14px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+    button {
+      min-height: 38px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 0 14px;
+      background: var(--lan);
+      color: #07111c;
+      cursor: pointer;
+      font-weight: 650;
+    }
+    button:hover {
+      filter: brightness(1.08);
+    }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: .55;
+    }
+    .ciyao {
+      background: transparent;
+      color: var(--wen);
+      border-color: var(--xian);
+    }
+    .weixian {
+      background: transparent;
+      color: var(--hong);
+      border-color: color-mix(in srgb, var(--hong) 55%, transparent);
+    }
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--xian);
+      border-radius: 6px;
+      background: #0c1116;
+      color: var(--wen);
+      padding: 10px 11px;
+      outline: none;
+    }
+    textarea {
+      min-height: 190px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    }
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--lan);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--lan) 20%, transparent);
+    }
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--ci);
+      font-size: 12px;
+    }
+    .ye {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 22px;
+    }
+    .dingbu {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+    .zhuangtai {
+      min-width: 0;
+      color: var(--ci);
+      text-align: right;
+      word-break: break-word;
+    }
+    .denglu {
+      display: grid;
+      grid-template-columns: minmax(220px, 360px) auto;
+      gap: 10px;
+      align-items: end;
+      max-width: 520px;
+    }
+    .wangge {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .mianban {
+      border: 1px solid var(--xian);
+      border-radius: 8px;
+      background: var(--mian);
+      padding: 14px;
+    }
+    .kuan-12 {
+      grid-column: span 12;
+    }
+    .kuan-8 {
+      grid-column: span 8;
+    }
+    .kuan-6 {
+      grid-column: span 6;
+    }
+    .kuan-4 {
+      grid-column: span 4;
+    }
+    .kuan-3 {
+      grid-column: span 3;
+    }
+    .biaoti {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    h2 {
+      margin: 0;
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+    .caozuo {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .biaodan {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .lianjie {
+      display: grid;
+      gap: 8px;
+    }
+    .lianjiehang {
+      display: grid;
+      grid-template-columns: 86px minmax(0, 1fr) auto;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--xian);
+      border-radius: 6px;
+      padding: 8px;
+      background: #0c1116;
+    }
+    .lianjiehang strong {
+      color: var(--wen);
+    }
+    .lianjiehang code {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--ci);
+    }
+    .jieguo {
+      min-height: 38px;
+      border: 1px solid var(--xian);
+      border-radius: 6px;
+      padding: 9px 11px;
+      color: var(--ci);
+      background: #0c1116;
+      word-break: break-word;
+    }
+    .hao {
+      color: var(--lv);
+    }
+    .cuo {
+      color: var(--hong);
+    }
+    .cang {
+      display: none !important;
+    }
+    @media (max-width: 820px) {
+      .ye {
+        padding: 14px;
+      }
+      .dingbu {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .zhuangtai {
+        text-align: left;
+      }
+      .denglu,
+      .lianjiehang {
+        grid-template-columns: 1fr;
+      }
+      .kuan-8,
+      .kuan-6,
+      .kuan-4,
+      .kuan-3 {
+        grid-column: span 12;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="ye">
+    <header class="dingbu">
+      <h1>UUID 管理</h1>
+      <div id="zhuangtaiWenzi" class="zhuangtai">未登录</div>
+    </header>
+
+    <section id="dengluPian" class="mianban">
+      <div class="denglu">
+        <label>后台密码
+          <input id="mima" type="password" autocomplete="current-password">
+        </label>
+        <button id="denglu" type="button">登录</button>
+      </div>
+    </section>
+
+    <section id="gongzuoPian" class="wangge cang">
+      <section class="mianban kuan-12">
+        <div class="biaoti">
+          <h2>配置</h2>
+          <div class="caozuo">
+            <button id="duqu" class="ciyao" type="button">读取</button>
+            <button id="baocunPeizhi" type="button">保存配置</button>
+            <button id="jiance" class="ciyao" type="button">检测</button>
+            <button id="tuichu" class="weixian" type="button">退出</button>
+          </div>
+        </div>
+        <div class="biaodan">
+          <label class="kuan-4">host
+            <input id="host" spellcheck="false">
+          </label>
+          <label class="kuan-4">uuid
+            <input id="uuid" spellcheck="false">
+          </label>
+          <label class="kuan-4">lingpai
+            <input id="lingpai" spellcheck="false">
+          </label>
+          <label class="kuan-3">lujing
+            <input id="lujing" spellcheck="false">
+          </label>
+          <label class="kuan-3">fingerprint
+            <input id="fingerprint" spellcheck="false">
+          </label>
+          <label class="kuan-3">mingcheng
+            <input id="mingcheng" spellcheck="false">
+          </label>
+          <label class="kuan-3">gengxinXiaoshi
+            <input id="gengxinXiaoshi" type="number" min="1" step="1">
+          </label>
+          <label class="kuan-6">zhuanhuanDizhi
+            <input id="zhuanhuanDizhi" spellcheck="false">
+          </label>
+          <label class="kuan-6">beiyongZhuanhuanDizhi
+            <input id="beiyongZhuanhuanDizhi" spellcheck="false">
+          </label>
+          <label class="kuan-12">chukou
+            <input id="chukou" spellcheck="false">
+          </label>
+        </div>
+      </section>
+
+      <section class="mianban kuan-6">
+        <div class="biaoti">
+          <h2>入口</h2>
+          <button id="baocunRukou" type="button">保存入口</button>
+        </div>
+        <textarea id="rukou" spellcheck="false"></textarea>
+      </section>
+
+      <section class="mianban kuan-6">
+        <div class="biaoti">
+          <h2>订阅</h2>
+          <button id="shuaxinDingyue" class="ciyao" type="button">刷新</button>
+        </div>
+        <div id="dingyueLianjie" class="lianjie"></div>
+      </section>
+
+      <section class="mianban kuan-6">
+        <div class="biaoti">
+          <h2>备份</h2>
+          <div class="caozuo">
+            <button id="daochu" class="ciyao" type="button">导出</button>
+            <button id="daoru" class="ciyao" type="button">导入</button>
+            <input id="daoruWenjian" type="file" accept="application/json,.json" class="cang">
+          </div>
+        </div>
+        <div id="beifenJieguo" class="jieguo">未执行。</div>
+      </section>
+
+      <section class="mianban kuan-6">
+        <div class="biaoti">
+          <h2>状态</h2>
+        </div>
+        <div id="jianceJieguo" class="jieguo">未检测。</div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const morenYuanDian = "https://uuid.dpdns.org";
+    const canshu = new URL(location.href).searchParams;
+    const yuanDian = (canshu.get("yuanDian") || localStorage.getItem("yuanDian") || morenYuanDian).replace(/\/+$/, "");
+    localStorage.setItem("yuanDian", yuanDian);
+
+    const yuan = {
+      zhuangtaiWenzi: document.getElementById("zhuangtaiWenzi"),
+      dengluPian: document.getElementById("dengluPian"),
+      gongzuoPian: document.getElementById("gongzuoPian"),
+      mima: document.getElementById("mima"),
+      denglu: document.getElementById("denglu"),
+      duqu: document.getElementById("duqu"),
+      baocunPeizhi: document.getElementById("baocunPeizhi"),
+      baocunRukou: document.getElementById("baocunRukou"),
+      jiance: document.getElementById("jiance"),
+      tuichu: document.getElementById("tuichu"),
+      host: document.getElementById("host"),
+      uuid: document.getElementById("uuid"),
+      lingpai: document.getElementById("lingpai"),
+      lujing: document.getElementById("lujing"),
+      fingerprint: document.getElementById("fingerprint"),
+      mingcheng: document.getElementById("mingcheng"),
+      gengxinXiaoshi: document.getElementById("gengxinXiaoshi"),
+      zhuanhuanDizhi: document.getElementById("zhuanhuanDizhi"),
+      beiyongZhuanhuanDizhi: document.getElementById("beiyongZhuanhuanDizhi"),
+      chukou: document.getElementById("chukou"),
+      rukou: document.getElementById("rukou"),
+      dingyueLianjie: document.getElementById("dingyueLianjie"),
+      shuaxinDingyue: document.getElementById("shuaxinDingyue"),
+      daochu: document.getElementById("daochu"),
+      daoru: document.getElementById("daoru"),
+      daoruWenjian: document.getElementById("daoruWenjian"),
+      beifenJieguo: document.getElementById("beifenJieguo"),
+      jianceJieguo: document.getElementById("jianceJieguo")
+    };
+
+    let dangqianPeizhi = null;
+
+    function guanliLingpai() {
+      return sessionStorage.getItem("guanliLingpai") || "";
+    }
+
+    function sheGuanliLingpai(value) {
+      if (value) {
+        sessionStorage.setItem("guanliLingpai", value);
+      } else {
+        sessionStorage.removeItem("guanliLingpai");
+      }
+    }
+
+    function dizhi(lujing) {
+      return yuanDian + lujing;
+    }
+
+    function sheZhuangtai(text, lei) {
+      yuan.zhuangtaiWenzi.textContent = text;
+      yuan.zhuangtaiWenzi.className = "zhuangtai " + (lei || "");
+    }
+
+    async function duJson(response) {
+      const text = await response.text();
+      let data = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        throw new Error("响应不是 JSON");
+      }
+      if (!response.ok) {
+        throw new Error(data.xinxi || "HTTP " + response.status);
+      }
+      return data;
+    }
+
+    async function qingqiu(lujing, xuanxiang = {}) {
+      const tou = { ...(xuanxiang.headers || {}) };
+      if (xuanxiang.body !== undefined) {
+        tou["content-type"] = "application/json";
+      }
+      const lingpai = guanliLingpai();
+      if (lingpai) {
+        tou["x-guanli-lingpai"] = lingpai;
+      }
+      const response = await fetch(dizhi(lujing), {
+        method: xuanxiang.method || "GET",
+        cache: "no-store",
+        headers: tou,
+        body: xuanxiang.body
+      });
+      return duJson(response);
+    }
+
+    function qiehuanDenglu(yidenglu) {
+      yuan.dengluPian.classList.toggle("cang", yidenglu);
+      yuan.gongzuoPian.classList.toggle("cang", !yidenglu);
+    }
+
+    function tianPeizhi(peizhi) {
+      const dingyue = peizhi.dingyue || {};
+      yuan.host.value = peizhi.host || "";
+      yuan.uuid.value = peizhi.uuid || "";
+      yuan.lingpai.value = peizhi.lingpai || "";
+      yuan.lujing.value = peizhi.lujing || "/";
+      yuan.fingerprint.value = peizhi.fingerprint || "chrome";
+      yuan.mingcheng.value = dingyue.mingcheng || "dingyue";
+      yuan.gengxinXiaoshi.value = dingyue.gengxinXiaoshi || 3;
+      yuan.zhuanhuanDizhi.value = dingyue.zhuanhuanDizhi || "";
+      yuan.beiyongZhuanhuanDizhi.value = dingyue.beiyongZhuanhuanDizhi || "";
+      yuan.chukou.value = peizhi.chukou || "";
+      shuaxinDingyue();
+    }
+
+    function shoujiPeizhi() {
+      return {
+        uuid: yuan.uuid.value.trim(),
+        host: yuan.host.value.trim(),
+        lujing: yuan.lujing.value.trim() || "/",
+        lingpai: yuan.lingpai.value.trim(),
+        fingerprint: yuan.fingerprint.value.trim() || "chrome",
+        chukou: yuan.chukou.value.trim(),
+        dingyue: {
+          mingcheng: yuan.mingcheng.value.trim() || "dingyue",
+          gengxinXiaoshi: Number(yuan.gengxinXiaoshi.value) || 3,
+          zhuanhuanDizhi: yuan.zhuanhuanDizhi.value.trim(),
+          beiyongZhuanhuanDizhi: yuan.beiyongZhuanhuanDizhi.value.trim()
+        }
+      };
+    }
+
+    async function duqu() {
+      sheZhuangtai("读取中");
+      const data = await qingqiu("/guanli/api/zhuangtai");
+      dangqianPeizhi = data.peizhi || {};
+      yuan.rukou.value = data.rukou || "";
+      tianPeizhi(dangqianPeizhi);
+      xianshiJiance(data.zhuangtai || {});
+      qiehuanDenglu(true);
+      sheZhuangtai("已读取", "hao");
+    }
+
+    async function denglu() {
+      sheZhuangtai("登录中");
+      const data = await qingqiu("/guanli/api/denglu", {
+        method: "POST",
+        body: JSON.stringify({ mima: yuan.mima.value })
+      });
+      sheGuanliLingpai(data.guanliLingpai);
+      yuan.mima.value = "";
+      await duqu();
+    }
+
+    async function baocunPeizhi() {
+      sheZhuangtai("保存配置中");
+      const data = await qingqiu("/guanli/api/baocun", {
+        method: "POST",
+        body: JSON.stringify({ peizhi: shoujiPeizhi() })
+      });
+      dangqianPeizhi = data.peizhi || shoujiPeizhi();
+      tianPeizhi(dangqianPeizhi);
+      sheZhuangtai("配置已保存", "hao");
+    }
+
+    async function baocunRukou() {
+      sheZhuangtai("保存入口中");
+      const data = await qingqiu("/guanli/api/rukou", {
+        method: "POST",
+        body: JSON.stringify({ rukou: yuan.rukou.value })
+      });
+      yuan.rukou.value = data.rukou || "";
+      sheZhuangtai("入口已保存", "hao");
+    }
+
+    function xianshiJiance(zhuangtai) {
+      const tongji = zhuangtai.tongji || {};
+      const shijian = zhuangtai.shangciJianceShijian || "未检测";
+      const xinxi = zhuangtai.xinxi || "";
+      yuan.jianceJieguo.textContent = shijian + " | rukou=" + (tongji.rukou || 0) + (xinxi ? " | " + xinxi : "");
+      yuan.jianceJieguo.className = "jieguo " + (zhuangtai.chenggong ? "hao" : "");
+    }
+
+    async function jiance() {
+      sheZhuangtai("检测中");
+      const data = await qingqiu("/guanli/api/jiance", { method: "POST", body: "{}" });
+      xianshiJiance(data.zhuangtai || {});
+      sheZhuangtai("检测完成", data.zhuangtai?.chenggong ? "hao" : "cuo");
+    }
+
+    function dingyueDizhi(geshi) {
+      const lingpai = yuan.lingpai.value.trim();
+      if (!lingpai) return "";
+      const url = new URL("/dingyue", yuanDian);
+      url.searchParams.set("lingpai", lingpai);
+      if (geshi) {
+        url.searchParams.set("geshi", geshi);
+      }
+      return url.href;
+    }
+
+    function shuaxinDingyue() {
+      const rows = [
+        ["文本", dingyueDizhi("")],
+        ["Base64", dingyueDizhi("base64")],
+        ["Clash", dingyueDizhi("clash")],
+        ["Sing-box", dingyueDizhi("singbox")]
+      ];
+      yuan.dingyueLianjie.innerHTML = rows.map(([mingcheng, href]) => {
+        return '<div class="lianjiehang"><strong>' + mingcheng + '</strong><code>' + escapeHtml(href || "未设置") + '</code><button class="ciyao" type="button" data-fuzhi="' + escapeHtml(href) + '" ' + (href ? "" : "disabled") + '>复制</button></div>';
+      }).join("");
+      yuan.dingyueLianjie.querySelectorAll("[data-fuzhi]").forEach((button) => {
+        button.addEventListener("click", () => fuzhi(button.dataset.fuzhi || ""));
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char]));
+    }
+
+    async function fuzhi(text) {
+      if (!text) return;
+      await navigator.clipboard.writeText(text);
+      sheZhuangtai("已复制", "hao");
+    }
+
+    async function daochu() {
+      const data = await qingqiu("/guanli/api/daochu");
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "uuid-backup.json";
+      a.click();
+      URL.revokeObjectURL(url);
+      yuan.beifenJieguo.textContent = "已导出。";
+    }
+
+    function daoru() {
+      yuan.daoruWenjian.click();
+    }
+
+    async function chuliDaoru() {
+      const file = yuan.daoruWenjian.files?.[0];
+      if (!file) return;
+      const backup = JSON.parse(await file.text());
+      const data = await qingqiu("/guanli/api/daoru", {
+        method: "POST",
+        body: JSON.stringify({ backup })
+      });
+      yuan.beifenJieguo.textContent = data.xinxi || "已导入。";
+      await duqu();
+    }
+
+    async function tuichu() {
+      try {
+        await qingqiu("/guanli/api/tuichu", { method: "POST", body: "{}" });
+      } catch {
+      }
+      sheGuanliLingpai("");
+      qiehuanDenglu(false);
+      sheZhuangtai("已退出");
+    }
+
+    async function baohu(fn) {
+      try {
+        await fn();
+      } catch (error) {
+        sheZhuangtai(error.message || "失败", "cuo");
+      }
+    }
+
+    yuan.denglu.addEventListener("click", () => baohu(denglu));
+    yuan.mima.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") baohu(denglu);
+    });
+    yuan.duqu.addEventListener("click", () => baohu(duqu));
+    yuan.baocunPeizhi.addEventListener("click", () => baohu(baocunPeizhi));
+    yuan.baocunRukou.addEventListener("click", () => baohu(baocunRukou));
+    yuan.jiance.addEventListener("click", () => baohu(jiance));
+    yuan.shuaxinDingyue.addEventListener("click", shuaxinDingyue);
+    yuan.daochu.addEventListener("click", () => baohu(daochu));
+    yuan.daoru.addEventListener("click", daoru);
+    yuan.daoruWenjian.addEventListener("change", () => baohu(chuliDaoru));
+    yuan.tuichu.addEventListener("click", () => baohu(tuichu));
+
+    if (guanliLingpai()) {
+      baohu(duqu);
+    }
+  </script>
+</body>
+</html>
