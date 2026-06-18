@@ -45,3 +45,20 @@
 ### Notes
 - `progress.md`: appended the deployment and online verification record.
 - Rollback: revert commit `74c747e` on `furulei/cf` or check out `a2a22f194401dbabba05b69070816a9f10d57ed0`, then redeploy `ip168-subconv` with `npx.cmd wrangler deploy`.
+
+## 2026-06-19 - Task: Keep admin QR subscription names in sync
+### What was done
+- Updated the admin QR panel so the visible QR code is regenerated when the subscription name, token, or link format changes.
+- Preserved the currently selected QR format while refreshing, so a Clash QR remains a Clash QR after the name changes.
+- Documented that the subscription display name is carried in the URL fragment for scan clients.
+
+### Testing
+- `npm.cmd test`: 32 test files passed, 214 tests passed.
+- `node -`: passed the admin QR name refresh check for default, renamed, and Clash-selected QR flows.
+- `git diff --check`: passed with no whitespace errors.
+
+### Notes
+- `admin/index.html`: remembered the active QR format and regenerated the displayed QR from the latest subscription link.
+- `docs/admin-qr-subscription-name.md`: documented the URL-fragment naming behavior and QR refresh rule.
+- `progress.md`: appended this implementation and verification record.
+- Rollback: run `git revert HEAD` after this task is committed.

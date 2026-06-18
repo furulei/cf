@@ -1629,7 +1629,8 @@
       },
       catalogSummary: null,
       links: {},
-      qrUrl: ""
+      qrUrl: "",
+      qrLabel: ""
     };
 
     const fields = {
@@ -2018,13 +2019,15 @@
       links.querySelectorAll("[data-qr]").forEach((button) => {
         button.addEventListener("click", () => renderQr(state.links[button.dataset.qr], button.dataset.qr));
       });
-      if (!state.qrUrl && state.links.Mixed) {
-        renderQr(state.links.Mixed, "Mixed");
+      const qrLabel = state.qrLabel && state.links[state.qrLabel] ? state.qrLabel : "Mixed";
+      if (state.links[qrLabel]) {
+        renderQr(state.links[qrLabel], qrLabel);
       }
     }
 
     function renderQr(value, label) {
       state.qrUrl = value || "";
+      state.qrLabel = label || "";
       const canvas = document.getElementById("qrCanvas");
       const ctx = canvas.getContext("2d");
       ctx.clearRect(0, 0, canvas.width, canvas.height);
