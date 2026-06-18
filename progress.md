@@ -28,3 +28,20 @@
 - `wrangler.toml`: moved `SUBLINK_KV` to the valid top-level binding location.
 - `progress.md`: appended this implementation and verification record.
 - Rollback: run `git revert HEAD` after this task is committed.
+
+## 2026-06-19 - Task: Deploy UUID168 converter and verify online output
+### What was done
+- Pushed local commit `74c747e fix: keep UUID168 converter compatible` to `furulei/cf` `main`.
+- Deployed the `ip168-subconv` Cloudflare Worker for `sub.ip168.dpdns.org`.
+- Verified that IP168 Clash and Sing-box subscription conversion now returns converted client config instead of the raw Base64 source subscription.
+
+### Testing
+- `git ls-remote origin refs/heads/main`: confirmed `origin/main` points to `74c747efba154ece0f7ee610e17d5ddd6635d91b`.
+- `npx.cmd wrangler deploy`: passed; deployed `ip168-subconv` to custom domain `sub.ip168.dpdns.org`, current Worker version `321e45ec-10b0-416f-921a-a97478d8869f`.
+- Online direct converter check: `/clash?config=<ip168 base64 source>` returned status 200, `text/yaml; charset=utf-8`, with Clash YAML sections and no leading Base64 `dmxlc3M` content.
+- Online IP168 main check: `/sub?token=<redacted>&clash` returned status 200, `text/yaml; charset=utf-8`, with Clash YAML sections and no leading Base64 `dmxlc3M` content.
+- Online IP168 Sing-box check: `/sub?token=<redacted>&sb` returned status 200, `application/json`, with Sing-box `outbounds`.
+
+### Notes
+- `progress.md`: appended the deployment and online verification record.
+- Rollback: revert commit `74c747e` on `furulei/cf` or check out `a2a22f194401dbabba05b69070816a9f10d57ed0`, then redeploy `ip168-subconv` with `npx.cmd wrangler deploy`.
