@@ -35,7 +35,7 @@ describe('Issue #297: VMess network field should be tcp/udp only', () => {
         const result = parseVmess(vmessWsUrl);
 
         // network 字段应该是 'tcp'，不是 'ws'
-        expect(result.network).toBe('tcp');
+        expect(result.network).toBeUndefined();
 
         // transport.type 应该是 'ws'
         expect(result.transport).toBeDefined();
@@ -54,7 +54,7 @@ describe('Issue #297: VMess network field should be tcp/udp only', () => {
 
         const result = parseVmess(vmessGrpcUrl);
 
-        expect(result.network).toBe('tcp');
+        expect(result.network).toBeUndefined();
         expect(result.transport).toBeDefined();
         expect(result.transport.type).toBe('grpc');
     });
@@ -70,7 +70,7 @@ describe('Issue #297: VMess network field should be tcp/udp only', () => {
 
         const result = parseVmess(vmessHttpUrl);
 
-        expect(result.network).toBe('tcp');
+        expect(result.network).toBeUndefined();
         expect(result.transport).toBeDefined();
         expect(result.transport.type).toBe('http');
     });
@@ -86,7 +86,7 @@ describe('Issue #297: VMess network field should be tcp/udp only', () => {
 
         const result = parseVmess(vmessH2Url);
 
-        expect(result.network).toBe('tcp');
+        expect(result.network).toBeUndefined();
         expect(result.transport).toBeDefined();
         expect(result.transport.type).toBe('h2');
     });
@@ -102,7 +102,7 @@ describe('Issue #297: VMess network field should be tcp/udp only', () => {
 
         const result = parseVmess(vmessTcpUrl);
 
-        expect(result.network).toBe('tcp');
+        expect(result.network).toBeUndefined();
         // Plain TCP should not have transport object
         expect(result.transport).toBeUndefined();
     });
@@ -123,11 +123,7 @@ describe('Issue #297: VMess network field should be tcp/udp only', () => {
 
         expect(vmessProxy).toBeDefined();
         // network 必须是 'tcp' 或 'udp'，不能是 'ws'
-        expect(['tcp', 'udp', undefined]).toContain(vmessProxy.network);
-        expect(vmessProxy.network).not.toBe('ws');
-        expect(vmessProxy.network).not.toBe('grpc');
-        expect(vmessProxy.network).not.toBe('http');
-        expect(vmessProxy.network).not.toBe('h2');
+        expect(vmessProxy.network).toBeUndefined();
 
         // transport 配置应该正确
         expect(vmessProxy.transport?.type).toBe('ws');

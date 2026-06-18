@@ -14,16 +14,16 @@
     "dev:node": "npm run build:node && node dist/node-server.cjs"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.16.8",
-    "esbuild": "^0.27.0",
+    "@cloudflare/vitest-pool-workers": "^0.16.17",
+    "esbuild": "^0.28.1",
     "vitest": "^4.1.7",
-    "wrangler": "^4.51.0"
+    "wrangler": "^4.102.0"
   },
   "dependencies": {
     "esbuild-register": "^3.6.0",
-    "hono": "^4.10.7",
+    "hono": "^4.12.26",
     "ioredis": "^5.8.2",
-    "js-yaml": "^4.1.1"
+    "js-yaml": "^4.2.0"
   },
   "engines": {
     "node": ">=18"

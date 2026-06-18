@@ -67,6 +67,17 @@ Sing-Box • Clash • Xray/V2Ray • Surge
 - Multi-language support (Chinese, English, Persian, Russian)
 - Web interface with predefined rule sets and customizable policy groups
 
+## UUID168 Compatibility
+
+The deployed converter at `https://sub.ip168.dpdns.org` keeps the interface used by UUID168:
+
+- `GET /clash?config=<subscription-url>` returns Clash YAML.
+- `GET /singbox?config=<subscription-url>` returns Sing-box JSON.
+- Existing options such as `selectedRules`, `group_by_country`, `customRules`, `include_auto_select`, and `singbox_version` remain supported.
+- The upstream `subscription-userinfo` header is preserved.
+
+See `docs/uuid168-interface.md` for the complete contract and verification commands.
+
 ## 🤝 Contributing
 
 Issues and Pull Requests are welcome to improve this project.

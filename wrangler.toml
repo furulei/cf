@@ -7,9 +7,9 @@ routes = [
   { pattern = "sub.ip168.dpdns.org", custom_domain = true }
 ]
 
-[assets]
-directory = "./public"
-
 kv_namespaces = [
   { binding = "SUBLINK_KV", id = "3c41a5d99ada43a7a7440e38292a3aef" }
 ]
+
+[assets]
+directory = "./public"

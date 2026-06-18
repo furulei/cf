@@ -98,10 +98,9 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
         // Create a shallow copy to avoid mutating the original
         const sanitized = { ...proxy };
 
-        // Remove Clash-specific fields that are not valid in sing-box outbound configuration
-        // In sing-box, UDP is controlled by 'network' field (defaults to both tcp and udp)
-        // The 'udp: true/false' field is a Clash/Clash Meta specific setting
+        // Strip Clash-only fields and avoid restricting sing-box outbounds to TCP.
         delete sanitized.udp;
+        delete sanitized.network;
 
         // Remove 'alpn' from root level - it should only exist inside 'tls' object for sing-box
         // For protocols like vless/vmess, alpn belongs inside the tls configuration
@@ -559,11 +558,12 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
             }, rule));
         });
 
+        // DNS must be intercepted before global mode can send it to a selector.
         this.config.route.rules.unshift(
-            { clash_mode: 'direct', outbound: 'DIRECT' },
-            { clash_mode: 'global', outbound: this.t('outboundNames.Node Select') },
             { action: 'sniff' },
-            { protocol: 'dns', action: 'hijack-dns' }
+            { protocol: 'dns', action: 'hijack-dns' },
+            { clash_mode: 'direct', outbound: 'DIRECT' },
+            { clash_mode: 'global', outbound: this.t('outboundNames.Node Select') }
         );
 
         this.config.route.auto_detect_interface = true;
