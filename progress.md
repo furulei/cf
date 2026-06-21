@@ -56,9 +56,3 @@
 - `npm.cmd test`: 32 test files passed, 214 tests passed.
 - `node -`: passed the admin QR name refresh check for default, renamed, and Clash-selected QR flows.
 - `git diff --check`: passed with no whitespace errors.
-
-### Notes
-- `admin/index.html`: remembered the active QR format and regenerated the displayed QR from the latest subscription link.
-- `docs/admin-qr-subscription-name.md`: documented the URL-fragment naming behavior and QR refresh rule.
-- `progress.md`: appended this implementation and verification record.
-- Rollback: run `git revert HEAD` after this task is committed.
